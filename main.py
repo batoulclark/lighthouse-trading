@@ -14,7 +14,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import bots, dashboard, health, webhooks
+from app.api import bots, dashboard, health, web, webhooks
 from app.exchanges.base import BaseExchange
 from app.models.bot import BotStore
 from app.models.trade import TradeLog
@@ -25,6 +25,7 @@ from app.safety.kill_switch import KillSwitch
 from app.safety.state_backup import StateBackup
 from app.services.order_executor import OrderExecutor
 from app.services.position_manager import PositionManager
+from app.services.monitor import MonitorService
 from app.services.signal_processor import SignalProcessor
 from config import settings
 
@@ -116,6 +117,16 @@ async def lifespan(app: FastAPI):
         position_manager=position_manager,
     )
 
+    # ── Monitoring service ────────────────────────────────────────────────
+    monitor = MonitorService(
+        kill_switch=kill_switch,
+        position_manager=position_manager,
+        bot_store=bot_store,
+        telegram=telegram,
+        trade_log=trade_log,
+        exchanges=exchanges,
+    )
+
     # ── Emergency Stop-Loss monitor ───────────────────────────────────────
     esl = EmergencyStopLoss(
         kill_switch=kill_switch,
@@ -144,9 +155,11 @@ async def lifespan(app: FastAPI):
     app.state.telegram_commands = telegram_commands
     app.state.esl = esl
     app.state.backup = backup
+    app.state.monitor = monitor
 
     # ── Start background tasks ────────────────────────────────────────────
     await esl.start()
+    await monitor.start()
     telegram_commands.start()
 
     # ── Startup notification ──────────────────────────────────────────────
@@ -168,6 +181,7 @@ async def lifespan(app: FastAPI):
 
     # ── Shutdown ──────────────────────────────────────────────────────────
     await esl.stop()
+    await monitor.stop()
     telegram_commands.stop()
     await telegram.send_shutdown()
 
@@ -200,6 +214,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(web.router)       # GET / (dashboard HTML) — registered first
     app.include_router(health.router)
     app.include_router(webhooks.router)
     app.include_router(bots.router)

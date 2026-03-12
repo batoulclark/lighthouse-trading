@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lighthouse Trading — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --green:     #3fb950;
+      --red:       #f85149;
+      --yellow:    #d29922;
+      --blue:      #58a6ff;
+      --orange:    #e3a44f;
+      --radius:    6px;
+      --font:      'Courier New', Courier, monospace;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+
+    /* ── Layout ────────────────────────────────────────────────────────────── */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px 40px;
+    }
+
+    /* ── Status Bar ────────────────────────────────────────────────────────── */
+    #status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      flex-wrap: wrap;
+    }
+
+    #status-bar .brand {
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: var(--blue);
+      margin-right: 8px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-pill.green  { background: rgba(63,185,80,.15);  color: var(--green); }
+    .status-pill.yellow { background: rgba(210,153,34,.15); color: var(--yellow);}
+    .status-pill.red    { background: rgba(248,81,73,.15);  color: var(--red);   }
+
+    .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot.green  { background: var(--green);  box-shadow: 0 0 5px var(--green); }
+    .dot.yellow { background: var(--yellow); box-shadow: 0 0 5px var(--yellow);}
+    .dot.red    { background: var(--red);    box-shadow: 0 0 5px var(--red);   }
+
+    #last-refresh {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    /* ── Kill Switch Button ─────────────────────────────────────────────────── */
+    #ks-btn {
+      padding: 4px 14px;
+      border-radius: var(--radius);
+      border: 1px solid;
+      font-family: var(--font);
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: opacity 0.15s;
+    }
+    #ks-btn:hover { opacity: 0.8; }
+    #ks-btn.armed {
+      background: rgba(248,81,73,.1);
+      border-color: var(--red);
+      color: var(--red);
+    }
+    #ks-btn.safe {
+      background: rgba(63,185,80,.1);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* ── Page Header ────────────────────────────────────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--text);
+    }
+
+    /* ── Grid ───────────────────────────────────────────────────────────────── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ──────────────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* ── Stat tiles ─────────────────────────────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .stat-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      min-width: 120px;
+      flex: 1;
+    }
+
+    .stat-tile .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-tile .value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    /* ── Tables ─────────────────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 6px 10px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(48,54,61,.5);
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+
+    tbody td {
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .badge.green  { background: rgba(63,185,80,.15);  color: var(--green); }
+    .badge.red    { background: rgba(248,81,73,.15);  color: var(--red);  }
+    .badge.yellow { background: rgba(210,153,34,.15); color: var(--yellow);}
+    .badge.blue   { background: rgba(88,166,255,.15); color: var(--blue); }
+    .badge.gray   { background: rgba(139,148,158,.15);color: var(--muted);}
+
+    .pos { color: var(--green); }
+    .neg { color: var(--red);   }
+
+    /* ── Chart ──────────────────────────────────────────────────────────────── */
+    .chart-wrap {
+      position: relative;
+      height: 220px;
+    }
+
+    /* ── Alerts ─────────────────────────────────────────────────────────────── */
+    .alert-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .alert-item {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border-left: 3px solid;
+      font-size: 12px;
+    }
+    .alert-item.INFO     { border-color: var(--blue);   background: rgba(88,166,255,.05); }
+    .alert-item.WARNING  { border-color: var(--yellow);  background: rgba(210,153,34,.05); }
+    .alert-item.CRITICAL { border-color: var(--red);    background: rgba(248,81,73,.05);  }
+
+    .alert-item .alert-meta {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Empty states ───────────────────────────────────────────────────────── */
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px;
+      font-size: 12px;
+    }
+
+    /* ── Loading spinner ────────────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ──────────────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      padding: 10px 18px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    #toast.show { opacity: 1; }
+    #toast.success { background: rgba(63,185,80,.9);  color: #fff; }
+    #toast.error   { background: rgba(248,81,73,.9);  color: #fff; }
+    #toast.info    { background: rgba(88,166,255,.9); color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- ── Status Bar ─────────────────────────────────────────────────────────── -->
+<div id="status-bar">
+  <span class="brand">🔦 LIGHTHOUSE</span>
+  <span id="sys-pill" class="status-pill gray">
+    <span class="dot" id="sys-dot"></span>
+    <span id="sys-label">Loading…</span>
+  </span>
+  <span id="ks-pill" class="status-pill gray">
+    <span id="ks-label">Kill Switch: —</span>
+  </span>
+  <button id="ks-btn" class="armed" onclick="toggleKillSwitch()">⚡ Toggle KS</button>
+  <span id="last-refresh">Never refreshed</span>
+</div>
+
+<!-- ── Main content ───────────────────────────────────────────────────────── -->
+<div class="container">
+
+  <!-- Stat tiles -->
+  <div style="margin-top:20px;">
+    <div class="stats-row">
+      <div class="stat-tile">
+        <div class="label">Total P&L</div>
+        <div class="value" id="stat-pnl">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Win Rate</div>
+        <div class="value" id="stat-wr">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Total Trades</div>
+        <div class="value" id="stat-trades">—</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Active Bots</div>
+        <div class="value" id="stat-bots">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bots + Equity chart row -->
+  <div class="grid-2">
+
+    <!-- Active Bots -->
+    <div class="card">
+      <div class="card-title">Active Bots</div>
+      <div class="table-wrap">
+        <table id="bots-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Pair</th>
+              <th>Exchange</th>
+              <th>Leverage</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="bots-body">
+            <tr><td colspan="5" class="empty"><span class="spinner"></span> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Equity Curve -->
+    <div class="card">
+      <div class="card-title">Equity Curve</div>
+      <div class="chart-wrap">
+        <canvas id="equity-chart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Recent Trades + Alerts row -->
+  <div class="grid-2">
+
+    <!-- Recent Trades -->
+    <div class="card">
+      <div class="card-title">Recent Trades (last 20)</div>
+      <div class="table-wrap">
+        <table id="trades-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Bot</th>
+              <th>Pair</th>
+              <th>Side</th>
+              <th>Fill</th>
+              <th>P&L</th>
+            </tr>
+          </thead>
+          <tbody id="trades-body">
+            <tr><td colspan="6" class="empty"><span class="spinner"></span> Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="card">
+      <div class="card-title">Recent Alerts</div>
+      <div id="alerts-list" class="alert-list">
+        <div class="empty"><span class="spinner"></span> Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /container -->
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<script>
+// ── State ────────────────────────────────────────────────────────────────────
+let equityChart = null;
+let killSwitchActive = false;
+
+// ── Utility ──────────────────────────────────────────────────────────────────
+function fmt(val, decimals = 2) {
+  if (val == null || val === undefined) return '—';
+  return Number(val).toFixed(decimals);
+}
+
+function fmtUSD(val) {
+  if (val == null) return '—';
+  const n = Number(val);
+  return (n >= 0 ? '+' : '') + '$' + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+function fmtTime(iso) {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('en-GB', {
+      month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+      hour12: false,
+    });
+  } catch { return iso.substring(0, 16); }
+}
+
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => { t.className = ''; }, 3000);
+}
+
+async function apiFetch(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+  return resp.json();
+}
+
+// ── Kill Switch ───────────────────────────────────────────────────────────────
+async function toggleKillSwitch() {
+  const action = killSwitchActive ? 'deactivate' : 'activate';
+  const confirm_msg = killSwitchActive
+    ? 'Deactivate kill switch and resume trading?'
+    : '⚠️ ACTIVATE kill switch and halt ALL trading?';
+  if (!window.confirm(confirm_msg)) return;
+
+  try {
+    const resp = await fetch(`/bots/kill-switch/${action}`, { method: 'POST' });
+    if (!resp.ok) {
+      const body = await resp.json().catch(() => ({}));
+      showToast('Error: ' + (body.detail || resp.statusText), 'error');
+      return;
+    }
+    showToast(`Kill switch ${action}d`, action === 'activate' ? 'error' : 'success');
+    await refreshAll();
+  } catch (e) {
+    showToast('Request failed: ' + e.message, 'error');
+  }
+}
+
+// ── Status Bar ────────────────────────────────────────────────────────────────
+function updateStatusBar(ksActive, exchangeOk) {
+  killSwitchActive = ksActive;
+
+  const sysPill  = document.getElementById('sys-pill');
+  const sysDot   = document.getElementById('sys-dot');
+  const sysLabel = document.getElementById('sys-label');
+  const ksPill   = document.getElementById('ks-pill');
+  const ksLabel  = document.getElementById('ks-label');
+  const ksBtn    = document.getElementById('ks-btn');
+
+  // Overall system status
+  if (ksActive) {
+    sysPill.className  = 'status-pill red';
+    sysDot.className   = 'dot red';
+    sysLabel.textContent = 'HALTED';
+  } else if (!exchangeOk) {
+    sysPill.className  = 'status-pill yellow';
+    sysDot.className   = 'dot yellow';
+    sysLabel.textContent = 'DEGRADED';
+  } else {
+    sysPill.className  = 'status-pill green';
+    sysDot.className   = 'dot green';
+    sysLabel.textContent = 'RUNNING';
+  }
+
+  // Kill switch pill
+  if (ksActive) {
+    ksPill.className   = 'status-pill red';
+    ksLabel.textContent = 'Kill Switch: ACTIVE';
+    ksBtn.className    = 'safe';
+    ksBtn.textContent  = '✓ Resume Trading';
+  } else {
+    ksPill.className   = 'status-pill green';
+    ksLabel.textContent = 'Kill Switch: OFF';
+    ksBtn.className    = 'armed';
+    ksBtn.textContent  = '⚡ Halt Trading';
+  }
+}
+
+// ── Overview ─────────────────────────────────────────────────────────────────
+async function loadOverview() {
+  const data = await apiFetch('/dashboard');
+  const perf = data.performance || {};
+
+  killSwitchActive = !!data.kill_switch_active;
+
+  // Stat tiles
+  const pnl = perf.total_pnl;
+  const pnlEl = document.getElementById('stat-pnl');
+  pnlEl.textContent = pnl != null ? fmtUSD(pnl) : '—';
+  pnlEl.className = 'value ' + (pnl >= 0 ? 'pos' : 'neg');
+
+  const wr = perf.win_rate;
+  document.getElementById('stat-wr').textContent = wr != null ? fmt(wr * 100, 1) + '%' : '—';
+  document.getElementById('stat-trades').textContent = perf.total_trades ?? '—';
+  document.getElementById('stat-bots').textContent = data.bot_count ?? '—';
+
+  // Bots table
+  const tbody = document.getElementById('bots-body');
+  const bots  = data.bots || [];
+  if (bots.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No bots configured</td></tr>';
+  } else {
+    tbody.innerHTML = bots.map(b => `
+      <tr>
+        <td>${escHtml(b.name)}</td>
+        <td>${escHtml(b.pair)}</td>
+        <td>${escHtml(b.exchange)}</td>
+        <td>${b.leverage}×</td>
+        <td>
+          <span class="badge ${b.enabled ? 'green' : 'gray'}">
+            ${b.enabled ? 'ON' : 'OFF'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  updateStatusBar(data.kill_switch_active, true);
+}
+
+// ── Equity Chart ─────────────────────────────────────────────────────────────
+async function loadEquityChart() {
+  const data   = await apiFetch('/dashboard/equity');
+  const curve  = (data.equity_curve || []).sort((a, b) => a.date < b.date ? -1 : 1);
+  const labels = curve.map(p => p.date);
+  const values = curve.map(p => p.equity);
+
+  const ctx = document.getElementById('equity-chart').getContext('2d');
+
+  if (equityChart) {
+    equityChart.data.labels  = labels;
+    equityChart.data.datasets[0].data = values;
+    equityChart.update('none');
+    return;
+  }
+
+  equityChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Equity',
+        data: values,
+        borderColor: '#3fb950',
+        backgroundColor: 'rgba(63,185,80,.08)',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: '#161b22',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          titleColor: '#8b949e',
+          bodyColor: '#e6edf3',
+          callbacks: {
+            label: ctx => ' $' + Number(ctx.raw).toLocaleString('en-US', {minimumFractionDigits: 2}),
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#8b949e', font: { size: 10 }, maxTicksLimit: 8 },
+          grid:  { color: 'rgba(48,54,61,.5)' },
+        },
+        y: {
+          ticks: {
+            color: '#8b949e',
+            font: { size: 10 },
+            callback: v => '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits: 0}),
+          },
+          grid: { color: 'rgba(48,54,61,.5)' },
+        },
+      },
+    },
+  });
+}
+
+// ── Trades Table ─────────────────────────────────────────────────────────────
+async function loadTrades() {
+  const data   = await apiFetch('/dashboard/trades?limit=20');
+  const trades = data.trades || [];
+  const tbody  = document.getElementById('trades-body');
+
+  if (trades.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">No trades yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = trades.map(t => {
+    const pnl     = t.pnl;
+    const pnlHtml = pnl != null
+      ? `<span class="${pnl >= 0 ? 'pos' : 'neg'}">${fmtUSD(pnl)}</span>`
+      : '<span class="muted">—</span>';
+    const side = (t.action || '').toLowerCase();
+    return `
+      <tr>
+        <td style="color:var(--muted)">${fmtTime(t.timestamp)}</td>
+        <td>${escHtml(t.bot_name || t.bot_id || '—')}</td>
+        <td>${escHtml(t.pair || '—')}</td>
+        <td>
+          <span class="badge ${side === 'buy' ? 'green' : 'red'}">
+            ${side.toUpperCase() || '—'}
+          </span>
+        </td>
+        <td>${t.fill_price != null ? '$' + Number(t.fill_price).toLocaleString('en-US', {minimumFractionDigits: 2}) : '—'}</td>
+        <td>${pnlHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ── Alerts ────────────────────────────────────────────────────────────────────
+async function loadAlerts() {
+  const data    = await apiFetch('/monitor/alerts');
+  const alerts  = data.alerts || [];
+  const list    = document.getElementById('alerts-list');
+
+  if (alerts.length === 0) {
+    list.innerHTML = '<div class="empty">No alerts — all systems normal ✓</div>';
+    return;
+  }
+
+  list.innerHTML = alerts.slice(0, 20).map(a => `
+    <div class="alert-item ${escHtml(a.level || 'INFO')}">
+      <div>${escHtml(a.message || '')}</div>
+      <div class="alert-meta">${escHtml(a.level || 'INFO')} · ${escHtml(a.check || '')} · ${fmtTime(a.timestamp)}</div>
+    </div>
+  `).join('');
+}
+
+// ── XSS protection ────────────────────────────────────────────────────────────
+function escHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+// ── Refresh all ───────────────────────────────────────────────────────────────
+async function refreshAll() {
+  const promises = [
+    loadOverview().catch(e => console.warn('overview:', e)),
+    loadEquityChart().catch(e => console.warn('equity:', e)),
+    loadTrades().catch(e => console.warn('trades:', e)),
+    loadAlerts().catch(e => console.warn('alerts:', e)),
+  ];
+  await Promise.allSettled(promises);
+
+  const now = new Date();
+  document.getElementById('last-refresh').textContent =
+    'Refreshed ' + now.toLocaleTimeString('en-GB');
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+refreshAll();
+setInterval(refreshAll, 30_000);
+</script>
+</body>
+</html>
