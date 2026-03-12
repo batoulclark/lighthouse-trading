@@ -1,0 +1,741 @@
+[
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:11.040853",
+    "data": {
+      "id": "77ikjQjdGFg",
+      "url": "https://youtube.com/watch?v=77ikjQjdGFg",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:34",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:47",
+          "title": "How it works?"
+        },
+        {
+          "time": "5:07",
+          "title": "Automate the Strategy"
+        },
+        {
+          "time": "5:30",
+          "title": "Strategy Scoring/Ranking"
+        },
+        {
+          "time": "7:20",
+          "title": "Overfitting"
+        },
+        {
+          "time": "7:57",
+          "title": "Get Access"
+        },
+        {
+          "time": "8:51",
+          "title": "How to use it!"
+        },
+        {
+          "time": "13:56",
+          "title": "Auto-Improve Trading Strategy with AI"
+        },
+        {
+          "time": "15:49",
+          "title": "Get Chart Data"
+        },
+        {
+          "time": "17:43",
+          "title": "Fix Backtesting issues (if any)"
+        },
+        {
+          "time": "20:12",
+          "title": "AutoTrading"
+        },
+        {
+          "time": "21:29",
+          "title": "Conclusion \\u0026 Help"
+        },
+        {
+          "time": "21:49",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "macd",
+        "rsi",
+        "ema",
+        "trend",
+        "backtest",
+        "optimize",
+        "parameter",
+        "overfitting",
+        "signum",
+        "automate",
+        "pine",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:11.040806"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:12.145583",
+    "data": {
+      "id": "qbyQ8322m-M",
+      "url": "https://youtube.com/watch?v=qbyQ8322m-M",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "0:57",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:10",
+          "title": "How I built it"
+        },
+        {
+          "time": "4:11",
+          "title": "Strategy Performance (KPIs)"
+        },
+        {
+          "time": "7:15",
+          "title": "Get Access to Strategy"
+        },
+        {
+          "time": "7:30",
+          "title": "Automate the Strategy"
+        },
+        {
+          "time": "8:56",
+          "title": "BEST Overall Crypto Strategy"
+        },
+        {
+          "time": "12:12",
+          "title": "Plot Twist (OMG)"
+        },
+        {
+          "time": "13:50",
+          "title": "AutoTrading"
+        },
+        {
+          "time": "15:18",
+          "title": "Conclusion"
+        },
+        {
+          "time": "16:13",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "macd",
+        "rsi",
+        "ema",
+        "trend",
+        "backtest",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "pine",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:12.145561"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:13.336524",
+    "data": {
+      "id": "Zepx8mARre0",
+      "url": "https://youtube.com/watch?v=Zepx8mARre0",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:07",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:20",
+          "title": "How it works?"
+        },
+        {
+          "time": "5:30",
+          "title": "How to use it!"
+        },
+        {
+          "time": "7:30",
+          "title": "Create trading strategy from scratch"
+        },
+        {
+          "time": "12:22",
+          "title": "Download TradingView Chart data"
+        },
+        {
+          "time": "13:11",
+          "title": "Ovoid Overfitting"
+        },
+        {
+          "time": "14:14",
+          "title": "Get the AI Backtesting Engine"
+        },
+        {
+          "time": "14:52",
+          "title": "Automate Trading Strategies with SIGNUM"
+        },
+        {
+          "time": "15:17",
+          "title": "Conclusion"
+        },
+        {
+          "time": "15:35",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "rsi",
+        "ema",
+        "trend",
+        "backtest",
+        "optimize",
+        "parameter",
+        "overfitting",
+        "signum",
+        "automate",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:13.336491"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:14.361226",
+    "data": {
+      "id": "CEJ_R5226xE",
+      "url": "https://youtube.com/watch?v=CEJ_R5226xE",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:10",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:22",
+          "title": "How it works"
+        },
+        {
+          "time": "4:53",
+          "title": "My setup"
+        },
+        {
+          "time": "6:51",
+          "title": "Use it yourself"
+        },
+        {
+          "time": "9:23",
+          "title": "OpenClaw Trading Prompts"
+        },
+        {
+          "time": "12:58",
+          "title": "AutoTrading"
+        },
+        {
+          "time": "14:28",
+          "title": "Cost \\u0026 Conclusion"
+        },
+        {
+          "time": "17:28",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "rsi",
+        "ema",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:14.361189"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:15.448106",
+    "data": {
+      "id": "lQ3ZbZcOeU4",
+      "url": "https://youtube.com/watch?v=lQ3ZbZcOeU4",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:07",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:19",
+          "title": "The Gold Strategy"
+        },
+        {
+          "time": "4:28",
+          "title": "You need Patience"
+        },
+        {
+          "time": "5:08",
+          "title": "Buy Gold now?"
+        },
+        {
+          "time": "7:35",
+          "title": "Sell Gold now?"
+        },
+        {
+          "time": "8:36",
+          "title": "Automate your Portfolio"
+        },
+        {
+          "time": "10:07",
+          "title": "THE GOLD TRAP"
+        },
+        {
+          "time": "11:11",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "rsi",
+        "ema",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "tradingview",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:15.448086"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:16.598722",
+    "data": {
+      "id": "HzA8o5fg5T8",
+      "url": "https://youtube.com/watch?v=HzA8o5fg5T8",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:14",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:26",
+          "title": "Better than other AIs?"
+        },
+        {
+          "time": "2:07",
+          "title": "Convert Indicator to Strategy"
+        },
+        {
+          "time": "8:54",
+          "title": "Improve Strategy"
+        },
+        {
+          "time": "14:29",
+          "title": "New Strategy"
+        },
+        {
+          "time": "17:35",
+          "title": "Re-Create Closed Source Indicator"
+        },
+        {
+          "time": "19:02",
+          "title": "Conclusion"
+        },
+        {
+          "time": "20:33",
+          "title": "Become a Master of Automation"
+        },
+        {
+          "time": "21:32",
+          "title": "Next video..."
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "rsi",
+        "ema",
+        "trend",
+        "backtest",
+        "optimize",
+        "parameter",
+        "signum",
+        "webhook",
+        "automate",
+        "pine",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai",
+        "chatgpt"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:16.598697"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:17.774594",
+    "data": {
+      "id": "2LC979UiRns",
+      "url": "https://youtube.com/watch?v=2LC979UiRns",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:16",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "1:29",
+          "title": "Better than other AIs?"
+        },
+        {
+          "time": "4:21",
+          "title": "Convert Indicator to Strategy"
+        },
+        {
+          "time": "10:17",
+          "title": "Performance on BTC, ETH, SOL, ..."
+        },
+        {
+          "time": "12:15",
+          "title": "Improve Trading Strategy"
+        },
+        {
+          "time": "17:01",
+          "title": "New Strategy from Scratch"
+        },
+        {
+          "time": "17:46",
+          "title": "Re-Create Closed Source Indicator"
+        },
+        {
+          "time": "18:50",
+          "title": "Conclusion"
+        },
+        {
+          "time": "19:54",
+          "title": "Become a Master of Automation"
+        },
+        {
+          "time": "20:53",
+          "title": "Next video to watch"
+        }
+      ],
+      "keywords": [
+        "macd",
+        "rsi",
+        "ema",
+        "trend",
+        "backtest",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "pine",
+        "tradingview",
+        "claude",
+        "opus",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:17.774570"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:18.908757",
+    "data": {
+      "id": "qMHd7NMu_Gc",
+      "url": "https://youtube.com/watch?v=qMHd7NMu_Gc",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "0:50",
+          "title": "Saved $millions"
+        },
+        {
+          "time": "1:54",
+          "title": "Disclaimer"
+        },
+        {
+          "time": "2:06",
+          "title": "Step 1"
+        },
+        {
+          "time": "2:54",
+          "title": "Strategies you can use today"
+        },
+        {
+          "time": "4:28",
+          "title": "Indicators vs Strategies"
+        },
+        {
+          "time": "4:59",
+          "title": "Step 2"
+        },
+        {
+          "time": "6:33",
+          "title": "Step 3"
+        },
+        {
+          "time": "8:33",
+          "title": "AutoTrading"
+        },
+        {
+          "time": "9:32",
+          "title": "Next video"
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "rsi",
+        "ema",
+        "ichimoku",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "tradingview",
+        "gpt",
+        "ai",
+        "chatgpt"
+      ],
+      "channel": "Michael Ionita (Personal)",
+      "first_seen": "2026-03-12T09:33:18.908739"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:19.880787",
+    "data": {
+      "id": "LB9DuhHXmrU",
+      "url": "https://youtube.com/watch?v=LB9DuhHXmrU",
+      "keywords": [
+        "rsi",
+        "ema",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "tradingview",
+        "claude",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Signum App (Product)",
+      "first_seen": "2026-03-12T09:33:19.880764"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:20.686943",
+    "data": {
+      "id": "vODuZmWFqxc",
+      "url": "https://youtube.com/watch?v=vODuZmWFqxc",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "1:10",
+          "title": "100% Order Size (relative)"
+        },
+        {
+          "time": "4:48",
+          "title": "Let Strategy Decide (absolute)"
+        },
+        {
+          "time": "7:09",
+          "title": "Funds need to be in Sync"
+        },
+        {
+          "time": "8:31",
+          "title": "Sync Funds (universal version)"
+        },
+        {
+          "time": "11:33",
+          "title": "Sync Funds (date version)"
+        },
+        {
+          "time": "12:36",
+          "title": "Use AI (add date filter)"
+        },
+        {
+          "time": "14:29",
+          "title": "Custom Alert Message (for coders)"
+        }
+      ],
+      "keywords": [
+        "rsi",
+        "ema",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "pine",
+        "tradingview",
+        "gpt",
+        "ai"
+      ],
+      "channel": "Signum App (Product)",
+      "first_seen": "2026-03-12T09:33:20.686911"
+    }
+  },
+  {
+    "type": "new_video",
+    "timestamp": "2026-03-12T09:33:21.763362",
+    "data": {
+      "id": "RiyIcLCwrWk",
+      "url": "https://youtube.com/watch?v=RiyIcLCwrWk",
+      "chapters": [
+        {
+          "time": "0:00",
+          "title": "Intro"
+        },
+        {
+          "time": "0:45",
+          "title": "Flow of trading signals from Alerts"
+        },
+        {
+          "time": "2:12",
+          "title": "Where to start debugging"
+        },
+        {
+          "time": "4:35",
+          "title": "Settings become backed into the Alert"
+        },
+        {
+          "time": "5:13",
+          "title": "Your Chart differs from your Alert settings"
+        },
+        {
+          "time": "6:49",
+          "title": "Checkboxes are NOT shown in Alerts"
+        },
+        {
+          "time": "8:15",
+          "title": "Strategy not on chart"
+        },
+        {
+          "time": "9:38",
+          "title": "On every tick feature"
+        },
+        {
+          "time": "10:51",
+          "title": "Alerts trigger based on Strategy + Timeframe"
+        },
+        {
+          "time": "11:48",
+          "title": "Wait for Alerts to trigger"
+        },
+        {
+          "time": "14:18",
+          "title": "Alerts triggered but have errors"
+        },
+        {
+          "time": "18:01",
+          "title": "Testing your Bots quickly"
+        }
+      ],
+      "keywords": [
+        "gaussian",
+        "rsi",
+        "ema",
+        "bot1",
+        "trend",
+        "optimize",
+        "parameter",
+        "signum",
+        "automate",
+        "tradingview",
+        "ai"
+      ],
+      "channel": "Signum App (Product)",
+      "first_seen": "2026-03-12T09:33:21.763338"
+    }
+  },
+  {
+    "type": "signum_check",
+    "timestamp": "2026-03-12T09:33:22.043120",
+    "data": {
+      "timestamp": "2026-03-12T09:33:22.043042",
+      "exchanges": [
+        "binance",
+        "bitget",
+        "bybit",
+        "coinbase",
+        "gate",
+        "hyperliquid",
+        "kraken",
+        "kucoin",
+        "mexc",
+        "okx"
+      ],
+      "page_size": 339261
+    }
+  }
+]
