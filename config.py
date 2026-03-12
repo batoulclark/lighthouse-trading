@@ -76,6 +76,17 @@ class Config:
         )
     )
 
+    # Exchange mode
+    exchange_mode: str = field(
+        default_factory=lambda: os.getenv("EXCHANGE_MODE", "paper")
+    )
+    paper_starting_balance: float = field(
+        default_factory=lambda: float(os.getenv("PAPER_STARTING_BALANCE", "10000"))
+    )
+    paper_trades_file: str = field(
+        default_factory=lambda: os.getenv("PAPER_TRADES_FILE", "data/paper_trades.json")
+    )
+
     # Paths
     bots_file: str = field(
         default_factory=lambda: os.getenv("BOTS_FILE", "data/bots.json")

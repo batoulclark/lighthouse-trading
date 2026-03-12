@@ -64,8 +64,19 @@ async def lifespan(app: FastAPI):
         chat_id=settings.telegram_chat_id,
     )
 
-    # ── Exchange connectors (lazy — only if credentials present) ──────────
+    # ── Exchange connectors ───────────────────────────────────────────────
     exchanges: Dict[str, BaseExchange] = {}
+
+    if settings.exchange_mode == "paper":
+        from app.exchanges.paper import PaperExchange
+        exchanges["paper"] = PaperExchange(
+            starting_balance=settings.paper_starting_balance,
+            trades_file=settings.paper_trades_file,
+        )
+        logger.info(
+            "Paper trading mode — PaperExchange registered (balance=%.2f USDT)",
+            settings.paper_starting_balance,
+        )
 
     if settings.hl_private_key and settings.hl_account_address:
         try:
