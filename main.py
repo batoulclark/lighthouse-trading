@@ -19,10 +19,12 @@ from app.exchanges.base import BaseExchange
 from app.models.bot import BotStore
 from app.models.trade import TradeLog
 from app.notifications.telegram import TelegramNotifier
+from app.notifications.telegram_commands import TelegramCommandHandler
 from app.safety.emergency_sl import EmergencyStopLoss
 from app.safety.kill_switch import KillSwitch
 from app.safety.state_backup import StateBackup
 from app.services.order_executor import OrderExecutor
+from app.services.position_manager import PositionManager
 from app.services.signal_processor import SignalProcessor
 from config import settings
 
@@ -94,11 +96,24 @@ async def lifespan(app: FastAPI):
     # ── Services ──────────────────────────────────────────────────────────
     signal_processor = SignalProcessor(bot_store)
 
+    position_manager = PositionManager()
+
     order_executor = OrderExecutor(
         exchanges=exchanges,
         kill_switch=kill_switch,
         trade_log=trade_log,
         telegram=telegram,
+        position_manager=position_manager,
+    )
+
+    # ── Telegram command handler ───────────────────────────────────────────
+    telegram_commands = TelegramCommandHandler(
+        bot_token=settings.telegram_bot_token,
+        allowed_chat_id=settings.telegram_chat_id,
+        kill_switch=kill_switch,
+        bot_store=bot_store,
+        trade_log=trade_log,
+        position_manager=position_manager,
     )
 
     # ── Emergency Stop-Loss monitor ───────────────────────────────────────
@@ -125,11 +140,14 @@ async def lifespan(app: FastAPI):
     app.state.exchanges = exchanges
     app.state.signal_processor = signal_processor
     app.state.order_executor = order_executor
+    app.state.position_manager = position_manager
+    app.state.telegram_commands = telegram_commands
     app.state.esl = esl
     app.state.backup = backup
 
     # ── Start background tasks ────────────────────────────────────────────
     await esl.start()
+    telegram_commands.start()
 
     # ── Startup notification ──────────────────────────────────────────────
     await telegram.send_startup(settings.host, settings.port)
@@ -150,6 +168,7 @@ async def lifespan(app: FastAPI):
 
     # ── Shutdown ──────────────────────────────────────────────────────────
     await esl.stop()
+    telegram_commands.stop()
     await telegram.send_shutdown()
 
     # Final backup on shutdown

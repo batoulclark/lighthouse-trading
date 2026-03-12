@@ -19,6 +19,7 @@ from app.models.signal import Signal
 from app.models.trade import Trade, TradeLog
 from app.notifications.telegram import TelegramNotifier
 from app.safety.kill_switch import KillSwitch
+from app.services.position_manager import PositionManager
 
 logger = logging.getLogger(__name__)
 
@@ -35,11 +36,13 @@ class OrderExecutor:
         kill_switch: KillSwitch,
         trade_log: TradeLog,
         telegram: TelegramNotifier,
+        position_manager: Optional[PositionManager] = None,
     ) -> None:
         self._exchanges = exchanges
         self._kill_switch = kill_switch
         self._trade_log = trade_log
         self._telegram = telegram
+        self._position_manager = position_manager
 
     # ── Public API ───────────────────────────────────────────────────────────
 
@@ -112,6 +115,34 @@ class OrderExecutor:
             fees=result.fees if result else None,
             error=error,
         )
+
+        # ── Update position manager ───────────────────────────────────────────
+        if self._position_manager and not error and result:
+            try:
+                if signal.is_close():
+                    self._position_manager.close_position(
+                        bot.id, bot.pair, result.fill_price or 0.0
+                    )
+                elif signal.is_long():
+                    self._position_manager.open_position(
+                        bot_id=bot.id,
+                        symbol=bot.pair,
+                        side="long",
+                        size=result.size or 0.0,
+                        entry_price=result.fill_price or 0.0,
+                        leverage=bot.leverage,
+                    )
+                elif signal.is_short():
+                    self._position_manager.open_position(
+                        bot_id=bot.id,
+                        symbol=bot.pair,
+                        side="short",
+                        size=result.size or 0.0,
+                        entry_price=result.fill_price or 0.0,
+                        leverage=bot.leverage,
+                    )
+            except Exception as exc:
+                logger.error("Position manager update failed: %s", exc)
 
         # ── Persist ───────────────────────────────────────────────────────
         try:
