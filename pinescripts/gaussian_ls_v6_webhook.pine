@@ -1,0 +1,241 @@
+//@version=6
+// ─────────────────────────────────────────────────────────────────
+// Gaussian L+S v6 — Lighthouse Webhook Alerts
+// The EXACT strategy Jean tested (+1,781% on TV)
+// WITH alert() calls that send JSON to Lighthouse Trading webhook
+// ─────────────────────────────────────────────────────────────────
+strategy("Gaussian L+S v6 — Lighthouse", overlay=true,
+     initial_capital=1000,
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100,
+     commission_type=strategy.commission.percent,
+     commission_value=0.055,
+     slippage=0,
+     pyramiding=2,
+     calc_on_every_tick=false,
+     process_orders_on_close=true,
+     currency=currency.USD)
+
+// ═══════════════════════════════════════════
+// INPUTS
+// ═══════════════════════════════════════════
+gc_period=input.int(25,"Gaussian Period")
+gc_mult=input.float(0.8,"Gaussian Mult")
+sma_long=input.int(200,"SMA Long")
+sma_short_p=input.int(150,"SMA Short")
+ema_p=input.int(21,"EMA")
+macd_fast=input.int(12,"MACD Fast")
+macd_slow=input.int(26,"MACD Slow")
+macd_sig=input.int(9,"MACD Sig")
+tex=input.int(2,"Trend Exit Bars")
+re_band=input.float(0.4,"Re-entry Band")
+hold_min=input.int(5,"Hold Min L")
+s_hold_min=input.int(7,"Hold Min S")
+fast_re=input.int(10,"Fast Re Bars")
+pyr_max=input.int(2,"Max Pyr")
+pyr_band=input.float(0.3,"Pyr Band")
+pyr_profit=input.float(5.0,"Pyr Min %")
+trail_act=input.float(15.0,"Trail Act %")
+trail_pct=input.float(5.0,"Trail Dist %")
+
+// ═══════════════════════════════════════════
+// GAUSSIAN CHANNEL
+// ═══════════════════════════════════════════
+src=hlc3
+beta_gc=(1-math.cos(2*math.pi/gc_period))/(math.pow(2,1.0)-1)
+alpha_gc=-beta_gc+math.sqrt(beta_gc*beta_gc+2*beta_gc)
+
+var float gc=na
+if bar_index<4
+    gc:=src
+else
+    float prev1=nz(gc[1])
+    float prev2=nz(gc[2])
+    gc:=alpha_gc*alpha_gc*src+2*(1-alpha_gc)*prev1-(1-alpha_gc)*(1-alpha_gc)*prev2
+
+tr_val=ta.tr(true)
+var float gc_tr=na
+if bar_index<4
+    gc_tr:=tr_val
+else
+    float tp1=nz(gc_tr[1])
+    float tp2=nz(gc_tr[2])
+    gc_tr:=alpha_gc*alpha_gc*tr_val+2*(1-alpha_gc)*tp1-(1-alpha_gc)*(1-alpha_gc)*tp2
+
+gc_upper=gc+gc_mult*math.abs(gc_tr)
+gc_lower=gc-gc_mult*math.abs(gc_tr)
+gc_green=gc>gc[1]
+
+// ═══════════════════════════════════════════
+// INDICATORS
+// ═══════════════════════════════════════════
+sma200=ta.sma(close,sma_long)
+sma150=ta.sma(close,sma_short_p)
+ema21=ta.ema(close,ema_p)
+[macdLine,signalLine,histLine]=ta.macd(close,macd_fast,macd_slow,macd_sig)
+
+above_sma=not na(sma200) and close>sma200
+below_sma=not na(sma150) and close<sma150
+ch_w=gc_upper-gc_lower
+band_pos=ch_w>0?(close-gc_lower)/ch_w:0.5
+
+// ═══════════════════════════════════════════
+// STATE TRACKING
+// ═══════════════════════════════════════════
+var int bip=0
+var int bsle=999
+var int pyrc=0
+var bool isL=false
+var bool isS=false
+var float ep=0.0
+var bool trlA=false
+var float trlP=0.0
+
+if strategy.position_size!=0
+    bip+=1
+else
+    bip:=0
+    pyrc:=0
+    isL:=false
+    isS:=false
+    trlA:=false
+
+bsle+=1
+
+// ═══════════════════════════════════════════
+// LONG ENTRY SIGNALS
+// ═══════════════════════════════════════════
+tt=gc_green and not gc_green[1]
+pb=gc_green and gc_green[1] and gc_green[2]
+pb:=pb and band_pos<=re_band
+mcu=ta.crossover(histLine,0)
+fre=fast_re>0 and bsle<=fast_re and mcu
+longE=above_sma and not isL and not isS
+longE:=longE and(tt or pb or fre)
+
+// ═══════════════════════════════════════════
+// SHORT ENTRY SIGNALS
+// ═══════════════════════════════════════════
+shortE=below_sma and not isL and not isS
+shortE:=shortE and close<ema21 and close[1]>=ema21[1]
+
+// ═══════════════════════════════════════════
+// LONG EXIT SIGNALS
+// ═══════════════════════════════════════════
+grc=0
+for j=0 to tex-1
+    if not gc_green[j]
+        grc+=1
+
+smaXdn=not above_sma and not na(sma200[1])
+smaXdn:=smaXdn and close[1]>=sma200[1]
+longX=isL and bip>=hold_min
+longX:=longX and(grc>=tex or smaXdn)
+
+// ═══════════════════════════════════════════
+// SHORT EXIT SIGNALS
+// ═══════════════════════════════════════════
+mcpos=ta.crossover(histLine,0)
+emaXup=close>ema21 and close[1]<=ema21[1]
+smaXup=above_sma and not na(sma200[1])
+smaXup:=smaXup and close[1]<=sma200[1]
+shortX=isS and bip>=s_hold_min
+shortX:=shortX and(mcpos or emaXup or smaXup)
+
+// ═══════════════════════════════════════════
+// TRAILING STOP
+// ═══════════════════════════════════════════
+var bool trlT=false
+trlT:=false
+
+if strategy.position_size!=0 and trail_act>0
+    float upct=0.0
+    if isL
+        upct:=(close-ep)/ep*100
+    else if isS
+        upct:=(ep-close)/ep*100
+    if not trlA and upct>=trail_act
+        trlA:=true
+        trlP:=close
+    if trlA
+        if isL
+            if close>trlP
+                trlP:=close
+            if close<=trlP*(1-trail_pct/100)
+                trlT:=true
+        else if isS
+            if close<trlP
+                trlP:=close
+            if close>=trlP*(1+trail_pct/100)
+                trlT:=true
+
+// ═══════════════════════════════════════════
+// EXECUTE EXITS + WEBHOOK ALERTS
+// ═══════════════════════════════════════════
+if trlT
+    if isL
+        strategy.close_all("Trail L")
+        alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"sell","price":{{close}},"position_size":0,"reason":"trail_long"}', alert.freq_once_per_bar)
+        bsle:=0
+        isL:=false
+        trlA:=false
+    else if isS
+        strategy.close_all("Trail S")
+        alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"buy","price":{{close}},"position_size":0,"reason":"trail_short"}', alert.freq_once_per_bar)
+        isS:=false
+        trlA:=false
+
+if longX and not trlT
+    strategy.close_all("Exit L")
+    alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"sell","price":{{close}},"position_size":0,"reason":"exit_long"}', alert.freq_once_per_bar)
+    bsle:=0
+    isL:=false
+    trlA:=false
+
+if shortX and not trlT
+    strategy.close_all("Exit S")
+    alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"buy","price":{{close}},"position_size":0,"reason":"exit_short"}', alert.freq_once_per_bar)
+    isS:=false
+    trlA:=false
+
+// ═══════════════════════════════════════════
+// EXECUTE ENTRIES + WEBHOOK ALERTS
+// ═══════════════════════════════════════════
+if longE and strategy.position_size==0
+    strategy.entry("Long",strategy.long)
+    alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"buy","price":{{close}},"position_size":100,"reason":"long_entry"}', alert.freq_once_per_bar)
+    isL:=true
+    isS:=false
+    pyrc:=0
+    ep:=close
+    trlA:=false
+
+if shortE and strategy.position_size==0
+    strategy.entry("Short",strategy.short)
+    alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"sell","price":{{close}},"position_size":-100,"reason":"short_entry"}', alert.freq_once_per_bar)
+    isS:=true
+    isL:=false
+    pyrc:=0
+    ep:=close
+    trlA:=false
+
+// Pyramiding
+canPyr=isL and pyrc<pyr_max and bip>=5
+canPyr:=canPyr and not trlT
+canPyr:=canPyr and((close-ep)/ep*100)>=pyr_profit
+canPyr:=canPyr and band_pos<=pyr_band and gc_green
+if canPyr
+    string pyrN="Pyr "+str.tostring(pyrc+1)
+    strategy.entry(pyrN,strategy.long)
+    alert('{"schema":"2","timestamp":"{{timenow}}","ticker":"{{ticker}}","action":"buy","price":{{close}},"position_size":100,"reason":"pyramid_' + str.tostring(pyrc+1) + '"}', alert.freq_once_per_bar)
+    pyrc+=1
+
+// ═══════════════════════════════════════════
+// PLOTS
+// ═══════════════════════════════════════════
+plot(gc_upper,"Upper",color.new(color.green,60))
+plot(gc_lower,"Lower",color.new(color.red,60))
+plot(gc,"GC",gc_green?color.green:color.red,linewidth=2)
+plot(sma200,"SMA200",color.blue)
+plot(sma150,"SMA150",color.orange)
+plot(ema21,"EMA21",color.purple)

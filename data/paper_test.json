@@ -1,0 +1,13 @@
+[
+  {
+    "timestamp": "2026-03-12T18:15:58.008714+00:00",
+    "order_id": "paper-60236516f9e2",
+    "exchange": "paper",
+    "symbol": "BTCUSDT",
+    "side": "buy",
+    "size": 0.1,
+    "fill_price": 82500,
+    "cost": 8250.0,
+    "balance_after": 1750.0
+  }
+]

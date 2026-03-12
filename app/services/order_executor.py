@@ -68,6 +68,10 @@ class OrderExecutor:
             return await self._record_error(signal, bot, msg)
 
         # ── Set leverage ──────────────────────────────────────────────────
+        # Inject signal price into paper exchange
+        if hasattr(exchange, "set_price") and getattr(signal, "price", None):
+            exchange.set_price(bot.pair, signal.price)
+
         try:
             await exchange.set_leverage(bot.pair, bot.leverage)
         except Exception as exc:

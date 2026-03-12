@@ -283,5 +283,9 @@ class PaperExchange(BaseExchange):
             return price
         return self._last_price.get(symbol, 0.0)
 
+    def set_price(self, symbol: str, price: float) -> None:
+        """Set last known price for a symbol (called by order executor with signal price)."""
+        self._last_price[symbol.upper()] = price
+
     def symbol_for_pair(self, pair: str) -> str:
         return pair.upper()

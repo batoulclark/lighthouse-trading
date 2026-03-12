@@ -37,9 +37,12 @@ class Signal:
     timestamp: str
     schema: str
     comment: Optional[str] = None
+    price: Optional[float] = None
 
     @classmethod
     def from_dict(cls, data: dict) -> "Signal":
+        price_raw = data.get("price")
+        price_val = float(price_raw) if price_raw is not None else None
         return cls(
             bot_id=str(data["bot_id"]),
             ticker=str(data["ticker"]).upper().replace("-", "").replace("/", ""),
@@ -49,6 +52,7 @@ class Signal:
             timestamp=str(data["timestamp"]),
             schema=str(data.get("schema", "2")),
             comment=data.get("comment"),
+            price=price_val,
         )
 
     def to_dict(self) -> dict:
