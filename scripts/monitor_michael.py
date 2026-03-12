@@ -161,6 +161,10 @@ def main():
     known = load_known_videos()
     new_videos = []
 
+    # Only track videos published within last 30 days (Jean's directive: Mar 12)
+    from datetime import timedelta
+    cutoff = datetime.utcnow() - timedelta(days=30)
+    
     for handle, channel_name in CHANNELS.items():
         print(f"\n📺 Scanning {channel_name} ({handle})...")
         videos = scrape_channel(handle)
