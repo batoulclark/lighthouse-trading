@@ -1,0 +1,72 @@
+# Lighthouse Trading — .gitignore
+
+# Environment / secrets — NEVER commit these
+.env
+*.key
+*.pem
+
+# Kill switch file — managed at runtime
+KILL_SWITCH
+
+# Trade & bot data (personal data, large files)
+data/bots.json
+data/trades.json
+data/backups/
+~/lighthouse-backups/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+*.cover
+*.py,cover
+.hypothesis/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+lighthouse.pid
+
+# OS
+.DS_Store
+Thumbs.db
