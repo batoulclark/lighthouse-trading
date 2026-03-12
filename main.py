@@ -14,7 +14,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import bots, health, webhooks
+from app.api import bots, dashboard, health, webhooks
 from app.exchanges.base import BaseExchange
 from app.models.bot import BotStore
 from app.models.trade import TradeLog
@@ -184,6 +184,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(webhooks.router)
     app.include_router(bots.router)
+    app.include_router(dashboard.router)
 
     return app
 

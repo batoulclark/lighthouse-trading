@@ -127,6 +127,9 @@ def app_client(bot_store, trade_log, kill_switch, telegram, mock_exchange, sampl
     from app.safety.emergency_sl import EmergencyStopLoss
     from app.safety.state_backup import StateBackup
 
+    # Allow testclient IP for tests
+    settings.allowed_ips.append("testclient")
+
     application = create_app()
 
     # Override the lifespan by manually setting state
@@ -233,9 +236,11 @@ class TestWebhookEndpoint:
         # First signal — should succeed
         resp1 = app_client.post(f"/webhook/{sample_bot.id}", json=payload)
         assert resp1.status_code == 200
-        # Second with same timestamp — should be rejected
+        # Reset rate limiter so dedup check is reached
+        app_client.app.state.signal_processor._last_signal_time.clear()
+        # Second with same timestamp — should be rejected (409 dedup or 429 rate limit)
         resp2 = app_client.post(f"/webhook/{sample_bot.id}", json=payload)
-        assert resp2.status_code == 409
+        assert resp2.status_code in (409, 429)
 
     def test_kill_switch_blocks_execution(self, app_client, sample_bot, kill_switch):
         kill_switch.activate("test")

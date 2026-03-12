@@ -134,6 +134,8 @@ class TestDeduplication:
     def test_same_timestamp_rejected(self, processor, allowed_ips):
         ts = "2024-01-01T00:00:00+00:00"
         processor.process(_payload(ts=ts), "1.2.3.4", allowed_ips)
+        # Reset rate limiter so dedup check is reached
+        processor._last_signal_time.clear()
         with pytest.raises(SignalValidationError) as exc_info:
             processor.process(_payload(ts=ts), "1.2.3.4", allowed_ips)
         assert exc_info.value.status_code == 409
