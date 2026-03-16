@@ -1,0 +1,250 @@
+[
+  {
+    "timestamp": "2026-03-13T20:16:05.296968+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.0h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.0,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:17:06.553801+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.0h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.0,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:18:06.807838+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.0h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.0,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:19:08.048903+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:20:09.298320+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:21:02.948237+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:22:03.180161+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:23:13.458804+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:24:02.857595+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-13T20:24:04.743515+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 24.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 24.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:21:52.147041+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:22:04.596721+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:22:08.931742+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:22:25.726647+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:22:42.463182+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:22:58.978669+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:23:25.761559+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:23:43.537451+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:23:59.915240+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:24:16.613368+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:24:33.352258+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:24:50.156997+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.1h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.1,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:25:06.703520+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:25:23.486687+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:25:40.164114+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:25:47.365959+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:26:04.312077+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:26:15.184018+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:26:29.686290+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:26:41.913943+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-14T14:26:52.258661+00:00",
+    "level": "WARNING",
+    "check": "stale_signals",
+    "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
+    "hours_since_last_trade": 42.2,
+    "active_bot_count": 2
+  }
+]

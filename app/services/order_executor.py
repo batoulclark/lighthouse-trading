@@ -77,14 +77,31 @@ class OrderExecutor:
         except Exception as exc:
             logger.warning("set_leverage failed (non-fatal): %s", exc)
 
-        # ── Determine order size ──────────────────────────────────────────
-        try:
-            size = await self._resolve_size(signal, bot, exchange)
-        except Exception as exc:
-            return await self._record_error(signal, bot, f"Size calculation error: {exc}")
+        # ── Safety gate 2: Position guard (prevent double-entry) ─────────
+        if not signal.is_close() and self._position_manager:
+            existing = self._position_manager.get_position(bot.id)
+            if existing is not None:
+                side_match = (signal.is_long() and existing.side == "long") or \
+                             (signal.is_short() and existing.side == "short")
+                if side_match:
+                    msg = (
+                        f"Position guard: bot '{bot.name}' already has an open "
+                        f"{existing.side} position. Signal rejected to prevent double-entry."
+                    )
+                    logger.warning(msg)
+                    return await self._record_error(signal, bot, msg)
 
-        if size <= 0:
-            return await self._record_error(signal, bot, "Calculated size is zero or negative")
+        # ── Determine order size (skip for close signals) ─────────────────
+        if signal.is_close():
+            size = 0.0  # close_position handles its own sizing
+        else:
+            try:
+                size = await self._resolve_size(signal, bot, exchange)
+            except Exception as exc:
+                return await self._record_error(signal, bot, f"Size calculation error: {exc}")
+
+            if size <= 0:
+                return await self._record_error(signal, bot, "Calculated size is zero or negative")
 
         # ── Execute order ─────────────────────────────────────────────────
         result: Optional[OrderResult] = None

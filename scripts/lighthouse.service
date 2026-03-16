@@ -1,0 +1,19 @@
+[Unit]
+Description=Lighthouse Trading — TradingView webhook to exchange bridge
+After=network.target
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=yaraclawd
+WorkingDirectory=/home/yaraclawd/lighthouse-trading
+ExecStart=/home/yaraclawd/lighthouse-trading/.venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port 8420
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/home/yaraclawd/lighthouse-trading/.env
+
+[Install]
+WantedBy=default.target

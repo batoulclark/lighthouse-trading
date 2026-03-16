@@ -173,8 +173,8 @@ async def lifespan(app: FastAPI):
     await monitor.start()
     telegram_commands.start()
 
-    # ── Startup notification ──────────────────────────────────────────────
-    await telegram.send_startup(settings.host, settings.port)
+    # ── Startup notification (DISABLED — Jean: only notify on trades) ────
+    # await telegram.send_startup(settings.host, settings.port)
     logger.info(
         "Lighthouse Trading started — %s:%d", settings.host, settings.port
     )
@@ -194,7 +194,7 @@ async def lifespan(app: FastAPI):
     await esl.stop()
     await monitor.stop()
     telegram_commands.stop()
-    await telegram.send_shutdown()
+    # await telegram.send_shutdown()  # DISABLED — Jean: only notify on trades
 
     # Final backup on shutdown
     try:

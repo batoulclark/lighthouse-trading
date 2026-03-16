@@ -275,7 +275,11 @@ class MonitorService:
         return alerts
 
     async def _check_stale_signals(self) -> List[Dict[str, Any]]:
-        """Warn if no new trades in > 24 h while enabled bots exist."""
+        """Disabled — daily strategies legitimately go days/weeks without signals.
+        Stale signal spam was causing crash-loop with watchdog restarts."""
+        return []
+
+    async def _check_stale_signals_DISABLED(self) -> List[Dict[str, Any]]:
         active_bots = [b for b in self.bot_store.all() if b.enabled]
         if not active_bots:
             return []
@@ -303,10 +307,10 @@ class MonitorService:
         if most_recent is None:
             return []
 
-        now = datetime.now(timezone.utc)
         age = now - most_recent
 
         if age > timedelta(hours=_STALE_HOURS):
+            self._last_stale_alert = now
             hours = age.total_seconds() / 3600
             return [self._make_alert(
                 level=AlertLevel.WARNING,

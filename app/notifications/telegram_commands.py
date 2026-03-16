@@ -78,6 +78,11 @@ class TelegramCommandHandler:
 
     def start(self) -> None:
         """Start the background polling thread."""
+        # Disabled: Foufi token conflicts with OpenClaw gateway polling.
+        # Commands will work once Lighthouse gets a dedicated bot token
+        # that no other service polls on.
+        logger.info("TelegramCommandHandler disabled (token conflict avoidance)")
+        return
         if not self._enabled or self._running:
             return
         self._running = True
@@ -168,6 +173,11 @@ class TelegramCommandHandler:
             "/pnl":     self._cmd_pnl,
             "/help":    self._cmd_help,
         }
+
+        # Only respond to messages starting with /
+        if not cmd.startswith("/"):
+            logger.debug("Ignoring non-command message: %s", text[:50])
+            return
 
         handler = handlers.get(cmd)
         if handler:
