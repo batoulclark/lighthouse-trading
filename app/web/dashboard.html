@@ -1595,6 +1595,34 @@
     }
     .risk-row:last-child { border-bottom: none; }
     .muted { color: var(--muted); }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 768px) {
+      .metrics-row, .metric-cards { grid-template-columns: repeat(2, 1fr) !important; }
+      .main-grid { grid-template-columns: 1fr !important; }
+      .bottom-grid { grid-template-columns: 1fr !important; }
+      #tab-bar { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .tab-btn { font-size: 12px !important; padding: 8px 12px !important; }
+      #status-bar { flex-wrap: wrap; gap: 8px; }
+      .strategy-metrics { grid-template-columns: repeat(3, 1fr) !important; }
+      .scanner-coin { padding: 12px; }
+      .coin-score { font-size: 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-row, .metric-cards { grid-template-columns: 1fr !important; }
+      .strategy-metrics { grid-template-columns: repeat(2, 1fr) !important; }
+      .container { padding: 8px; }
+      #status-bar { padding: 8px; }
+      .tab-btn { font-size: 11px !important; padding: 6px 8px !important; }
+    }
+
+    /* ── Smooth tab transitions ── */
+    .tab-panel { opacity: 0; transition: opacity 0.2s ease; }
+    .tab-panel.active { opacity: 1; }
+
+    /* ── Card hover polish ── */
+    .card:hover, .metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); transition: all 0.2s; }
   </style>
 </head>
 <body>
@@ -1663,6 +1691,16 @@
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <div class="tab-panel active" id="panel-overview">
   <div class="container">
+
+    <!-- System Status Banner -->
+    <div id="system-banner" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:13px">
+      <div style="display:flex;align-items:center;gap:6px"><span id="banner-led" style="width:10px;height:10px;border-radius:50%;background:var(--muted)"></span><strong id="banner-status">Checking...</strong></div>
+      <div class="muted">Bots: <span id="banner-bots">—</span></div>
+      <div class="muted">Paper P&L: <span id="banner-pnl">—</span></div>
+      <div class="muted">Regime: <span id="banner-regime">—</span></div>
+      <div class="muted">Last signal: <span id="banner-signal">—</span></div>
+      <div style="margin-left:auto" class="muted"><span id="banner-refresh">—</span></div>
+    </div>
 
     <!-- Metric Cards -->
     <div class="metrics-grid" id="metrics-grid">
@@ -2806,9 +2844,56 @@ function fmtTimeAgo(d){const s=Math.floor((Date.now()-d.getTime())/1000);if(s<60
 let refreshTimer=30;
 setInterval(()=>{refreshTimer--;const el=document.getElementById('refresh-countdown');if(el)el.textContent='('+Math.max(0,refreshTimer)+'s)';},1000);
 
+async function loadSettings() {
+  const el = document.getElementById('settings-endpoints');
+  if (!el) return;
+  const endpoints = [
+    {path: '/health', desc: 'Server health'},
+    {path: '/strategies', desc: 'Strategy data'},
+    {path: '/watchlist', desc: 'Growth scanner'},
+    {path: '/monitor/status', desc: 'Monitor status'},
+    {path: '/reports/daily', desc: 'Daily P&L'},
+    {path: '/reports/execution', desc: 'Execution quality'},
+    {path: '/reports/correlation', desc: 'Correlation matrix'},
+    {path: '/reports/regime', desc: 'Market regime'},
+    {path: '/reports/audit', desc: 'Audit trail'},
+    {path: '/reports/decay', desc: 'Strategy decay'},
+  ];
+  let html = '';
+  for (const ep of endpoints) {
+    try {
+      const r = await fetch(ep.path);
+      const ok = r.status === 200;
+      html += '<div class="risk-row"><span class="muted">' + ep.desc + '</span><span style="color:' + (ok ? 'var(--green)' : 'var(--red)') + '">' + r.status + '</span></div>';
+    } catch {
+      html += '<div class="risk-row"><span class="muted">' + ep.desc + '</span><span style="color:var(--red)">ERR</span></div>';
+    }
+  }
+  el.innerHTML = html;
+}
+
+async function updateBanner() {
+  try {
+    const h = await apiFetch('/health');
+    document.getElementById('banner-led').style.background = h.status === 'ok' ? 'var(--green)' : 'var(--red)';
+    document.getElementById('banner-status').textContent = h.kill_switch_active ? '⛔ HALTED' : '✅ RUNNING';
+    document.getElementById('banner-bots').textContent = h.bots_loaded + ' loaded';
+  } catch { document.getElementById('banner-status').textContent = '❌ OFFLINE'; }
+  try {
+    const r = await apiFetch('/reports/regime');
+    document.getElementById('banner-regime').textContent = r.current_regime ? r.current_regime.replace(/_/g,' ') : '—';
+  } catch {}
+  try {
+    const t = await apiFetch('/dashboard/trades?limit=1');
+    const last = (t.trades || [])[0];
+    if (last) document.getElementById('banner-signal').textContent = fmtTimeAgo(new Date(last.timestamp));
+  } catch {}
+}
+
 async function refreshAll(){
   refreshTimer=30;
   await Promise.allSettled([
+    updateBanner().catch(()=>{}),
     loadOverview().catch(e=>console.warn('overview:',e)),
     loadEquityChart().catch(e=>console.warn('equity:',e)),
     loadSignals().catch(e=>console.warn('signals:',e)),
@@ -2817,6 +2902,7 @@ async function refreshAll(){
     loadScanner().catch(e=>console.warn('scanner:',e)),
     loadStrategies().catch(e=>console.warn('strategies:',e)),
     loadReports().catch(e=>console.warn('reports:',e)),
+    loadSettings().catch(e=>console.warn('settings:',e)),
   ]);
   document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en-GB');
   if(typeof window._ci==='undefined'){window._ci=true;import('/components/price-alerts.js').then(m=>{if(m.renderPriceAlerts)m.renderPriceAlerts('price-alerts-widget');}).catch(()=>{});import('/components/strategy-compare.js').then(m=>{if(m.renderStrategyCompare)m.renderStrategyCompare('strategy-compare-widget');}).catch(()=>{});}
