@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighthouse Strategy Tester</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f1117; color: #e1e1e6; }
+        .header { background: #1a1d28; padding: 16px 24px; border-bottom: 1px solid #2a2d3a; display: flex; align-items: center; gap: 12px; }
+        .header h1 { font-size: 20px; color: #4fc3f7; }
+        .header .subtitle { color: #888; font-size: 13px; }
+        .container { display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - 60px); }
+        
+        /* Sidebar */
+        .sidebar { background: #1a1d28; padding: 16px; overflow-y: auto; border-right: 1px solid #2a2d3a; }
+        .section { margin-bottom: 20px; }
+        .section h3 { font-size: 13px; color: #4fc3f7; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .field { margin-bottom: 8px; }
+        .field label { display: block; font-size: 12px; color: #888; margin-bottom: 3px; }
+        .field input, .field select { width: 100%; background: #0f1117; border: 1px solid #2a2d3a; color: #e1e1e6; padding: 8px; border-radius: 4px; font-size: 13px; }
+        .field input:focus, .field select:focus { border-color: #4fc3f7; outline: none; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .preset-btns { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .preset-btn { padding: 6px 12px; background: #2a2d3a; border: 1px solid #3a3d4a; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .preset-btn:hover { background: #3a3d4a; color: #fff; }
+        .preset-btn.active { background: #4fc3f7; color: #000; border-color: #4fc3f7; }
+        
+        .run-btn { width: 100%; padding: 12px; background: #4fc3f7; color: #000; border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+        .run-btn:hover { background: #38b0e3; }
+        .run-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        
+        /* Main */
+        .main { padding: 16px; overflow-y: auto; }
+        
+        /* Metrics */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+        .metric-card { background: #1a1d28; border: 1px solid #2a2d3a; border-radius: 8px; padding: 12px; }
+        .metric-card .label { font-size: 11px; color: #888; text-transform: uppercase; }
+        .metric-card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+        .metric-card .value.green { color: #4caf50; }
+        .metric-card .value.red { color: #f44336; }
+        .metric-card .value.blue { color: #4fc3f7; }
+        
+        /* Chart */
+        .chart-container { background: #1a1d28; border: 1px solid #2a2d3a; border-radius: 8px; padding: 16px; margin-bottom: 16px; height: 350px; }
+        
+        /* Trades table */
+        .trades-section { background: #1a1d28; border: 1px solid #2a2d3a; border-radius: 8px; padding: 16px; }
+        .trades-section h3 { margin-bottom: 10px; color: #4fc3f7; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 8px; color: #888; border-bottom: 1px solid #2a2d3a; font-weight: 500; }
+        td { padding: 6px 8px; border-bottom: 1px solid #1f2230; }
+        tr:hover { background: #1f2230; }
+        .win { color: #4caf50; }
+        .loss { color: #f44336; }
+        
+        /* Optimizer status */
+        .optimizer-bar { background: #1a1d28; border: 1px solid #2a2d3a; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px; }
+        .optimizer-bar .dot { width: 8px; height: 8px; border-radius: 50%; background: #4caf50; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .optimizer-bar .info { font-size: 13px; }
+        
+        .loading { text-align: center; padding: 40px; color: #888; }
+        .spinner { display: inline-block; width: 30px; height: 30px; border: 3px solid #333; border-top-color: #4fc3f7; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { max-height: 40vh; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔭 Lighthouse Strategy Tester</h1>
+        <span class="subtitle">Gaussian Channel L+S — Backtest Engine</span>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="section">
+                <h3>Presets</h3>
+                <div class="preset-btns">
+                    <button class="preset-btn" onclick="loadPreset('v6')">v6</button>
+                    <button class="preset-btn" onclick="loadPreset('v7.3')">v7.3</button>
+                    <button class="preset-btn" onclick="loadPreset('v8')">v8</button>
+                    <button class="preset-btn" onclick="loadPreset('v9')">v9</button>
+                    <button class="preset-btn active" onclick="loadPreset('v10')">v10 ⭐</button>
+                    <button class="preset-btn" onclick="loadPreset('v11')">v11</button>
+                    <button class="preset-btn" onclick="loadOptimizer()">🔄 Optimizer Best</button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Market</h3>
+                <div class="field">
+                    <label>Symbol</label>
+                    <select id="symbol">
+                        <option value="BTCUSDT">BTC/USDT</option>
+                        <option value="ETHUSDT">ETH/USDT</option>
+                        <option value="SOLUSDT">SOL/USDT</option>
+                        <option value="DOGEUSDT">DOGE/USDT</option>
+                        <option value="LINKUSDT">LINK/USDT</option>
+                        <option value="ARBUSDT">ARB/USDT</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>Timeframe</label>
+                        <select id="interval">
+                            <option value="5m">5m</option>
+                            <option value="15m">15m</option>
+                            <option value="30m">30m</option>
+                            <option value="1h">1H</option>
+                            <option value="4h">4H</option>
+                            <option value="1d" selected>1D</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Start Date</label>
+                        <input type="date" id="start" value="2018-01-01">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>Capital ($)</label>
+                        <input type="number" id="capital" value="1000">
+                    </div>
+                    <div class="field">
+                        <label>Leverage</label>
+                        <select id="leverage">
+                            <option value="1" selected>1x</option>
+                            <option value="2">2x</option>
+                            <option value="3">3x</option>
+                            <option value="5">5x</option>
+                            <option value="10">10x</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Fee (% round trip)</label>
+                    <input type="number" id="fee" value="0.1" step="0.01">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Gaussian Channel</h3>
+                <div class="row">
+                    <div class="field">
+                        <label>Period</label>
+                        <input type="number" id="period" value="25">
+                    </div>
+                    <div class="field">
+                        <label>Multiplier</label>
+                        <input type="number" id="mult" value="0.8" step="0.1">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Long Trailing Stop</h3>
+                <div class="row">
+                    <div class="field">
+                        <label>Activate (%)</label>
+                        <input type="number" id="trail_activate" value="12">
+                    </div>
+                    <div class="field">
+                        <label>Distance (%)</label>
+                        <input type="number" id="trail_pct" value="5">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Short Trailing Stop</h3>
+                <div class="row">
+                    <div class="field">
+                        <label>Activate (%)</label>
+                        <input type="number" id="short_trail_activate" value="8">
+                    </div>
+                    <div class="field">
+                        <label>Distance (%)</label>
+                        <input type="number" id="short_trail_pct" value="3">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Entry / Exit</h3>
+                <div class="row">
+                    <div class="field">
+                        <label>Hold Min (Long)</label>
+                        <input type="number" id="hold_min" value="7">
+                    </div>
+                    <div class="field">
+                        <label>Hold Min (Short)</label>
+                        <input type="number" id="short_hold_min" value="6">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="field">
+                        <label>Fast Re-entry Bars</label>
+                        <input type="number" id="fast_re_bars" value="7">
+                    </div>
+                    <div class="field">
+                        <label>Re-band</label>
+                        <input type="number" id="re_band" value="0.5" step="0.05">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="run-btn" id="runBtn" onclick="runBacktest()">▶ Run Backtest</button>
+        </div>
+        
+        <div class="main" id="mainContent">
+            <div class="optimizer-bar" id="optimizerBar" style="display:none;">
+                <div class="dot"></div>
+                <div class="info" id="optimizerInfo">Optimizer running...</div>
+            </div>
+            
+            <div id="results" style="display:none;">
+                <div class="metrics-grid" id="metricsGrid"></div>
+                <div class="chart-container"><canvas id="equityChart"></canvas></div>
+                <div class="trades-section">
+                    <h3>Trade Log</h3>
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        <table id="tradesTable">
+                            <thead><tr>
+                                <th>#</th><th>Side</th><th>Entry</th><th>Exit</th>
+                                <th>Entry $</th><th>Exit $</th><th>P&L %</th>
+                                <th>Net $</th><th>Bars</th><th>Reason</th><th>Balance</th>
+                            </tr></thead>
+                            <tbody id="tradesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="placeholder" class="loading">
+                <p style="font-size: 48px; margin-bottom: 16px;">🔭</p>
+                <p>Configure parameters and click <strong>Run Backtest</strong></p>
+                <p style="margin-top: 8px; color: #555;">Presets: v6→v11. ⭐ v10 = current production (TV +3,670%)</p>
+            </div>
+            
+            <div id="loadingState" class="loading" style="display:none;">
+                <div class="spinner"></div>
+                <p style="margin-top: 16px;">Fetching data & running backtest...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let equityChart = null;
+        let presets = {};
+        
+        // Load presets
+        fetch('/api/presets').then(r=>r.json()).then(d => { presets = d; });
+        
+        // Check optimizer
+        function checkOptimizer() {
+            fetch('/api/optimizer/status').then(r=>r.json()).then(d => {
+                if (d.pct) {
+                    document.getElementById('optimizerBar').style.display = 'flex';
+                    document.getElementById('optimizerInfo').innerHTML = 
+                        `Optimizer R${d.round}: <strong>+${d.pct}%</strong> (Python) | MDD ${d.mdd}% | PF ${d.pf} | ${d.trades}t | <span style="color:#888">${d.timestamp?.slice(0,19) || ''}</span>`;
+                }
+            }).catch(()=>{});
+        }
+        checkOptimizer();
+        setInterval(checkOptimizer, 30000);
+        
+        function loadPreset(name) {
+            const p = presets[name];
+            if (!p) return;
+            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            for (const [key, val] of Object.entries(p)) {
+                const el = document.getElementById(key);
+                if (el) el.value = val;
+            }
+        }
+        
+        function loadOptimizer() {
+            fetch('/api/optimizer/status').then(r=>r.json()).then(d => {
+                if (d.config) {
+                    const cfg = d.config;
+                    const map = {
+                        'period':'period','mult':'mult','trail_activate':'trail_activate',
+                        'trail_pct':'trail_pct','short_trail_activate':'short_trail_activate',
+                        'short_trail_pct':'short_trail_pct','hold_min':'hold_min',
+                        'short_hold_min':'short_hold_min','fast_re_bars':'fast_re_bars',
+                        're_band':'re_band'
+                    };
+                    for (const [cfgKey, elId] of Object.entries(map)) {
+                        const el = document.getElementById(elId);
+                        if (el && cfg[cfgKey] !== undefined) el.value = cfg[cfgKey];
+                    }
+                    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                }
+            });
+        }
+        
+        async function runBacktest() {
+            const btn = document.getElementById('runBtn');
+            btn.disabled = true; btn.textContent = '⏳ Running...';
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+            
+            const body = {};
+            ['symbol','interval','start','capital','leverage','fee','period','mult',
+             'trail_activate','trail_pct','short_trail_activate','short_trail_pct',
+             'hold_min','short_hold_min','fast_re_bars','re_band'].forEach(id => {
+                body[id] = document.getElementById(id).value;
+            });
+            
+            try {
+                const res = await fetch('/api/test', {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.error) { alert(data.error); return; }
+                renderResults(data);
+            } catch(e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false; btn.textContent = '▶ Run Backtest';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+        
+        function renderResults(data) {
+            const m = data.metrics;
+            document.getElementById('results').style.display = 'block';
+            
+            // Metrics
+            const grid = document.getElementById('metricsGrid');
+            const retClass = m.return_pct >= 0 ? 'green' : 'red';
+            const tv = data.tv_calibrated || {};
+            const tvEst = tv.tv_estimate_pct;
+            const tvWindow = tv.tv_window_return_pct;
+            grid.innerHTML = `
+                <div class="metric-card" style="border-color:#ff9800"><div class="label">📺 TV Estimate</div><div class="value" style="color:#ff9800;font-size:28px">${tvEst ? '~+' + Number(tvEst).toLocaleString() + '%' : 'N/A'}</div><div style="font-size:10px;color:#666;margin-top:2px">Calibrated from 2020+ window (÷1.21)</div></div>
+                <div class="metric-card"><div class="label">Python Return (full)</div><div class="value ${retClass}">${m.return_pct >= 0 ? '+' : ''}${m.return_pct.toLocaleString()}%</div></div>
+                <div class="metric-card"><div class="label">Python 2020+ Window</div><div class="value" style="color:#aaa">${tvWindow ? '+' + tvWindow.toLocaleString() + '%' : 'N/A'}</div></div>
+                <div class="metric-card"><div class="label">Final Equity</div><div class="value green">$${m.final_equity.toLocaleString()}</div></div>
+                <div class="metric-card"><div class="label">Max Drawdown</div><div class="value red">${m.mdd}%</div></div>
+                <div class="metric-card"><div class="label">Profit Factor</div><div class="value blue">${m.profit_factor}</div></div>
+                <div class="metric-card"><div class="label">Total Trades</div><div class="value blue">${m.total_trades}</div></div>
+                <div class="metric-card"><div class="label">Win Rate</div><div class="value ${m.win_rate >= 50 ? 'green' : 'red'}">${m.win_rate}%</div></div>
+                <div class="metric-card"><div class="label">Avg Win</div><div class="value green">+${m.avg_win}%</div></div>
+                <div class="metric-card"><div class="label">Avg Loss</div><div class="value red">${m.avg_loss}%</div></div>
+                <div class="metric-card"><div class="label">Longs</div><div class="value blue">${m.long_trades} (${m.long_wins}W)</div></div>
+                <div class="metric-card"><div class="label">Shorts</div><div class="value blue">${m.short_trades} (${m.short_wins}W)</div></div>
+                <div class="metric-card"><div class="label">Best Trade</div><div class="value green">+${m.best_trade}%</div></div>
+                <div class="metric-card"><div class="label">Worst Trade</div><div class="value red">${m.worst_trade}%</div></div>
+            `;
+            
+            // Chart
+            const eq = data.equity_curve;
+            const labels = eq.map(e => e.date);
+            const eqData = eq.map(e => e.equity);
+            const priceData = eq.map(e => e.price);
+            
+            if (equityChart) equityChart.destroy();
+            equityChart = new Chart(document.getElementById('equityChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Equity ($)',
+                            data: eqData,
+                            borderColor: '#4fc3f7',
+                            backgroundColor: 'rgba(79,195,247,0.1)',
+                            fill: true,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'BTC Price',
+                            data: priceData,
+                            borderColor: 'rgba(255,193,7,0.3)',
+                            borderWidth: 1,
+                            fill: false,
+                            tension: 0.1,
+                            pointRadius: 0,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { legend: { labels: { color: '#888' } } },
+                    scales: {
+                        x: { display: true, ticks: { color: '#555', maxTicksLimit: 10 }, grid: { color: '#1f2230' } },
+                        y: { position: 'left', ticks: { color: '#4fc3f7' }, grid: { color: '#1f2230' } },
+                        y1: { position: 'right', ticks: { color: '#ffc107' }, grid: { display: false } }
+                    }
+                }
+            });
+            
+            // Trades
+            const tbody = document.getElementById('tradesBody');
+            tbody.innerHTML = data.trades.map((t, i) => {
+                const cls = t.net >= 0 ? 'win' : 'loss';
+                return `<tr>
+                    <td>${i+1}</td>
+                    <td style="color:${t.side==='long'?'#4caf50':'#f44336'}">${t.side.toUpperCase()}</td>
+                    <td>${t.entry_date}</td><td>${t.exit_date}</td>
+                    <td>$${t.entry_price.toLocaleString()}</td>
+                    <td>$${t.exit_price.toLocaleString()}</td>
+                    <td class="${cls}">${t.pct >= 0 ? '+' : ''}${t.pct}%</td>
+                    <td class="${cls}">$${t.net.toFixed(0)}</td>
+                    <td>${t.held}</td>
+                    <td style="color:#888">${t.reason}</td>
+                    <td>$${t.balance.toLocaleString()}</td>
+                </tr>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "generated_at": "2026-03-20T01:30:53.634544+00:00",
+  "bots": [
+    "BTC Gaussian v10",
+    "BTC Gaussian v7",
+    "BTC Gaussian v8",
+    "ETH ROC v2",
+    "SOL ROC v2"
+  ],
+  "matrix": [
+    [
+      1.0,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      1.0,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      1.0,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      1.0,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      1.0
+    ]
+  ],
+  "interpretation": "Insufficient overlapping data to compute any pairwise correlation. Bots may be trading on different days.",
+  "bot_stats": {
+    "BTC Gaussian v10": {
+      "trading_days": 1,
+      "total_pnl": 0.0,
+      "avg_daily_pnl": 0.0
+    },
+    "BTC Gaussian v7": {
+      "trading_days": 2,
+      "total_pnl": 96.534,
+      "avg_daily_pnl": 48.267
+    },
+    "BTC Gaussian v8": {
+      "trading_days": 2,
+      "total_pnl": 0.0,
+      "avg_daily_pnl": 0.0
+    },
+    "ETH ROC v2": {
+      "trading_days": 1,
+      "total_pnl": 0.0,
+      "avg_daily_pnl": 0.0
+    },
+    "SOL ROC v2": {
+      "trading_days": 1,
+      "total_pnl": 0.0,
+      "avg_daily_pnl": 0.0
+    }
+  },
+  "meta": {
+    "total_trades_fetched": 43,
+    "bots_with_pnl_data": 5,
+    "numpy_used": true
+  }
+}

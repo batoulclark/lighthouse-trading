@@ -10,11 +10,14 @@ import sys
 from contextlib import asynccontextmanager
 from typing import Dict
 
+import os
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.api import bots, dashboard, health, watchlist, web, webhooks
+from app.api import bots, dashboard, health, monitor_api, reports, strategies, watchlist, web, webhooks
 from app.exchanges.base import BaseExchange
 from app.models.bot import BotStore
 from app.models.trade import TradeLog
@@ -231,11 +234,19 @@ def create_app() -> FastAPI:
     app.include_router(bots.router)
     app.include_router(dashboard.router)
     app.include_router(watchlist.router)
+    app.include_router(strategies.router)
+    app.include_router(monitor_api.router)
+    app.include_router(reports.router)
 
     return app
 
 
 app = create_app()
+
+# Serve component files
+components_dir = os.path.join(os.path.dirname(__file__), "app", "web", "components")
+if os.path.isdir(components_dir):
+    app.mount("/components", StaticFiles(directory=components_dir), name="components")
 
 
 # ── Dev entry point ───────────────────────────────────────────────────────────

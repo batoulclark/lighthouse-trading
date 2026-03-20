@@ -1583,18 +1583,6 @@
       color: var(--text);
     }
     .side-filter-btn:hover:not(.active) { color: var(--text-secondary); }
-
-    /* Settings panel helpers */
-    .risk-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border-light);
-      font-size: .82rem;
-    }
-    .risk-row:last-child { border-bottom: none; }
-    .muted { color: var(--muted); }
   </style>
 </head>
 <body>
@@ -1655,7 +1643,6 @@
   <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">Scanner</button>
   <button class="tab-btn" data-tab="strategies" onclick="switchTab('strategies')">Strategies</button>
   <button class="tab-btn" data-tab="history" onclick="switchTab('history')">History</button>
-  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
@@ -2058,60 +2045,6 @@
       <div class="pagination-wrap">
         <span class="page-info" id="hist-page-info"></span>
         <div class="pagination-btns" id="pagination"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- TAB: SETTINGS                                                              -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-settings" style="padding:20px">
-  <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">System Settings</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:16px">
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Safety Thresholds</h3>
-      <div class="risk-row"><span class="muted">ESL Warning</span><span>15%</span></div>
-      <div class="risk-row"><span class="muted">ESL Critical</span><span>20%</span></div>
-      <div class="risk-row"><span class="muted">ESL Catastrophic</span><span>30%</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L1</span><span>1% daily</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L2</span><span>2% daily</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L3</span><span>5% daily</span></div>
-      <div class="risk-row"><span class="muted">Dead Man Timeout</span><span>30 min</span></div>
-      <div class="risk-row"><span class="muted">Capital</span><span>$1,000</span></div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Cron Jobs</h3>
-      <div class="risk-row"><span class="muted">Watchdog v3</span><span>Every 5 min</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker</span><span>Every 5 min</span></div>
-      <div class="risk-row"><span class="muted">Dead Man Switch</span><span>Every 10 min</span></div>
-      <div class="risk-row"><span class="muted">Dashboard Monitor</span><span>Every 15 min</span></div>
-      <div class="risk-row"><span class="muted">Luna Backup</span><span>Daily 06:00 UTC</span></div>
-      <div class="risk-row"><span class="muted">Signal Backup</span><span>Daily 00:05 UTC</span></div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">API Endpoints</h3>
-      <div id="settings-endpoints">Loading...</div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Go-Live Checklist</h3>
-      <div style="font-size:13px">
-        <div>✅ TradingView alerts connected</div>
-        <div>✅ Paper trading active</div>
-        <div>✅ Kill switch tested</div>
-        <div>✅ ESL configured (15/20/30%)</div>
-        <div>✅ Circuit breaker active</div>
-        <div>✅ Dead man's switch active</div>
-        <div>✅ Monitoring crons running</div>
-        <div>⏳ Hyperliquid testnet API keys</div>
-        <div>⏳ 30-day paper trading validation</div>
-        <div>⏳ Walk-forward OOS test</div>
-        <div style="margin-top:8px;font-weight:600">Target: April 15, 2026</div>
       </div>
     </div>
 
@@ -2779,50 +2712,4 @@ function openBotModal(botId) {
         <div class="modal-stat-label">Win Rate</div>
       </div>
       <div class="modal-stat">
-        <div class="modal-stat-value">${perf.profit_factor != null ? fmt(perf.profit_factor) + 'x' : '—'}</div>        <div class="modal-stat-label">Profit Factor</div></div>
-      <div class="modal-stat"><div class="modal-stat-value">${perf.total_trades ?? '—'}</div><div class="modal-stat-label">Trades</div></div>
-      <div class="modal-stat"><div class="modal-stat-value">${perf.max_drawdown_pct != null ? '-'+fmt(perf.max_drawdown_pct,1)+'%' : '—'}</div><div class="modal-stat-label">Max DD</div></div>`;
-  } else { statsGrid.innerHTML = '<div class="empty">No data</div>'; }
-  const botTrades = allTrades.filter(t => t.bot_id === botId).slice(0,10);
-  const td = document.getElementById('modal-trades');
-  td.innerHTML = !botTrades.length ? '<div class="empty">No trades</div>' :
-    `<table><thead><tr><th>Time</th><th>Side</th><th>Price</th><th>P&L</th></tr></thead><tbody>`+
-    botTrades.map(t=>`<tr><td class="muted">${fmtTime(t.timestamp)}</td><td><span class="badge ${(t.action||'').toLowerCase()==='buy'?'green':'red'}">${(t.action||'—').toUpperCase()}</span></td><td>${t.fill_price?'$'+Number(t.fill_price).toLocaleString('en-US',{minimumFractionDigits:2}):'—'}</td><td>${t.pnl!=null?`<span class="${t.pnl>=0?'pos':'neg'}">${fmtUSD(t.pnl)}</span>`:'—'}</td></tr>`).join('')+`</tbody></table>`;
-}
-function closeModal(){const m=document.getElementById('bot-modal');if(m){m.style.display='none';}}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-
-async function loadScanner(){try{const d=await apiFetch('/watchlist');const coins=(d.coins||[]).sort((a,b)=>(b.score||0)-(a.score||0));const c=document.getElementById('scanner-coins');if(!c)return;const h=document.getElementById('scanner-last-scan');if(h&&d.updated_at)h.textContent='Last scan: '+fmtTimeAgo(new Date(d.updated_at));if(!coins.length){c.innerHTML='<div class="empty">Scanner inactive</div>';return;}c.innerHTML=coins.map(cn=>`<div class="scanner-coin ${cn.flagged?'flagged':''}"><div class="coin-header"><span class="coin-symbol">${escHtml(cn.symbol)}</span><span class="badge ${cn.trend==='bullish'?'green':cn.trend==='bearish'?'red':'gray'}">${escHtml(cn.trend||'—')}</span></div><div class="coin-score" style="color:${cn.score>=70?'var(--green)':cn.score>=40?'var(--yellow)':'var(--muted)'}">${fmt(cn.score,0)}</div><div class="coin-details"><span>$${cn.price?Number(cn.price).toLocaleString('en-US',{minimumFractionDigits:2}):'—'}</span><span>ROC: ${cn.roc_30?fmt(cn.roc_30,1)+'%':'—'}</span></div></div>`).join('');}catch(e){}}
-
-async function loadStrategies(){try{const d=await apiFetch('/strategies');const s=d.strategies||[];const c=document.getElementById('strategies-list');if(!c)return;c.innerHTML=s.map(st=>`<div class="strategy-card"><div class="strategy-header"><span class="strategy-name">${escHtml(st.name)}</span><span class="badge ${st.status==='champion'?'green':st.status==='candidate'?'blue':'gray'}">${escHtml(st.status)}</span></div><div class="strategy-metrics"><div><strong>${st.tv_return?'+'+Number(st.tv_return).toLocaleString()+'%':'—'}</strong><br><small>TV Return</small></div><div><strong>${st.tv_mdd?fmt(st.tv_mdd,1)+'%':'—'}</strong><br><small>MDD</small></div><div><strong>${st.tv_pf?fmt(st.tv_pf)+'x':'—'}</strong><br><small>PF</small></div><div><strong>${st.tv_wr?fmt(st.tv_wr,1)+'%':'—'}</strong><br><small>WR</small></div><div><strong>${st.tv_trades||'—'}</strong><br><small>Trades</small></div></div><div class="strategy-footer"><span class="badge ${st.tv_validated?'green':'yellow'}">${st.tv_validated?'✅ Validated':'⏳ Pending'}</span><span class="muted">${escHtml(st.pair||'')} · ${escHtml(st.timeframe||'1D')}</span></div></div>`).join('');}catch(e){}}
-
-async function loadReports(){
-  try{const d=await apiFetch('/reports/daily');const s=d.summary||{};document.getElementById('report-daily').innerHTML=`<div style="font-size:24px;font-weight:700" class="${(s.total_pnl||0)>=0?'pos':'neg'}">${fmtUSD(s.total_pnl)}</div><div class="muted">Sharpe: ${s.sharpe?fmt(s.sharpe):'—'} · Win: ${s.win_days||0} / Loss: ${s.loss_days||0}</div>`;}catch{document.getElementById('report-daily').innerHTML='<span class="muted">No data</span>';}
-  try{const r=await apiFetch('/reports/regime');document.getElementById('report-regime').innerHTML=`<div style="font-size:18px;font-weight:700">${r.current_regime?r.current_regime.replace(/_/g,' ').toUpperCase():'—'}</div><div class="muted">Vol: ${r.volatility_30d?fmt(r.volatility_30d,1)+'%':'—'}</div>`;}catch{document.getElementById('report-regime').innerHTML='<span class="muted">No data</span>';}
-}
-
-function fmtTimeAgo(d){const s=Math.floor((Date.now()-d.getTime())/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
-
-let refreshTimer=30;
-setInterval(()=>{refreshTimer--;const el=document.getElementById('refresh-countdown');if(el)el.textContent='('+Math.max(0,refreshTimer)+'s)';},1000);
-
-async function refreshAll(){
-  refreshTimer=30;
-  await Promise.allSettled([
-    loadOverview().catch(e=>console.warn('overview:',e)),
-    loadEquityChart().catch(e=>console.warn('equity:',e)),
-    loadSignals().catch(e=>console.warn('signals:',e)),
-    loadHistory().catch(e=>console.warn('history:',e)),
-    loadHealth().catch(e=>console.warn('health:',e)),
-    loadScanner().catch(e=>console.warn('scanner:',e)),
-    loadStrategies().catch(e=>console.warn('strategies:',e)),
-    loadReports().catch(e=>console.warn('reports:',e)),
-  ]);
-  document.getElementById('last-refresh').textContent='Updated '+new Date().toLocaleTimeString('en-GB');
-  if(typeof window._ci==='undefined'){window._ci=true;import('/components/price-alerts.js').then(m=>{if(m.renderPriceAlerts)m.renderPriceAlerts('price-alerts-widget');}).catch(()=>{});import('/components/strategy-compare.js').then(m=>{if(m.renderStrategyCompare)m.renderStrategyCompare('strategy-compare-widget');}).catch(()=>{});}
-}
-refreshAll();
-setInterval(refreshAll,30000);
-</script>
-</body>
-</html>
+        <div class="modal-stat-value">${perf.profit_factor != null ? fmt(perf.profit_factor) + 'x' : '—'}</div>

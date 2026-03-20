@@ -41,21 +41,20 @@ IBKR = {
     "URA":  21,
     "VRT":   4,
 }
-IBKR_CASH = 169.55
+IBKR_CASH = 176.41  # AED 66.49 + USD 158.31 (updated Mar 16 screenshot)
 
 
 def fetch_price(ticker):
-    """Fetch latest closing price from Yahoo Finance API."""
+    """Fetch last traded price from Yahoo Finance (regularMarketPrice — matches broker)."""
     try:
-        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
+        url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1d"
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         resp = urllib.request.urlopen(req, timeout=10)
         data = json.loads(resp.read())
-        closes = data["chart"]["result"][0]["indicators"]["quote"][0]["close"]
-        # Get last non-None close
-        for c in reversed(closes):
-            if c is not None:
-                return round(c, 2)
+        meta = data["chart"]["result"][0]["meta"]
+        price = round(meta.get("regularMarketPrice", 0), 2)
+        if price > 0:
+            return price
     except Exception as e:
         print(f"  Failed to fetch {ticker}: {e}")
     return None
@@ -117,7 +116,7 @@ def main():
 
     # Send via openclaw
     result = subprocess.run(
-        ["openclaw", "message", "send",
+        ["/home/yaraclawd/.npm-global/bin/openclaw", "message", "send",
          "--channel", "telegram", "--account", "luna",
          "--target", CHAT_ID,
          "-m", msg],

@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-03-20T01:30:33.864064+00:00",
+  "health_ok": true,
+  "bots_checked": 5,
+  "stale_bots": [
+    "DOGE ROC v1",
+    "NEAR ROC v1"
+  ],
+  "webhook_times": {
+    "SOL ROC v2": 6.0,
+    "ETH ROC v2": 6.4,
+    "BTC Gaussian v10": 7.3,
+    "DOGE ROC v1": 7.4,
+    "NEAR ROC v1": 8.6
+  },
+  "data_integrity_ok": true,
+  "service_active": true,
+  "enabled_bots": [
+    "SOL ROC v2",
+    "ETH ROC v2",
+    "BTC Gaussian v10",
+    "DOGE ROC v1",
+    "NEAR ROC v1"
+  ],
+  "alert_active": false
+}

@@ -1,0 +1,92 @@
+{
+  "generated_at": "2026-03-20T01:31:17.297797+00:00",
+  "period": {
+    "start": "2026-03-12",
+    "end": "2026-03-19"
+  },
+  "summary": {
+    "total_pnl": 96.534,
+    "sharpe": 12.9287,
+    "sortino": null,
+    "calmar": null,
+    "max_dd_duration": 0,
+    "recovery_factor": null,
+    "win_days": 2,
+    "loss_days": 0,
+    "best_day": {
+      "date": "2026-03-12",
+      "pnl": 60.606
+    },
+    "worst_day": {
+      "date": "2026-03-18",
+      "pnl": 0.0
+    },
+    "current_streak": {
+      "type": "none",
+      "count": 0
+    }
+  },
+  "daily": [
+    {
+      "date": "2026-03-12",
+      "pnl": 60.606,
+      "cumulative": 60.606,
+      "trades": 1
+    },
+    {
+      "date": "2026-03-17",
+      "pnl": 35.928,
+      "cumulative": 96.534,
+      "trades": 3
+    },
+    {
+      "date": "2026-03-18",
+      "pnl": 0.0,
+      "cumulative": 96.534,
+      "trades": 1
+    },
+    {
+      "date": "2026-03-19",
+      "pnl": 0.0,
+      "cumulative": 96.534,
+      "trades": 8
+    }
+  ],
+  "attribution": [
+    {
+      "bot_name": "BTC Gaussian v7",
+      "pnl": 96.534,
+      "trades": 3,
+      "win_rate": 1.0,
+      "pf": null
+    },
+    {
+      "bot_name": "ETH ROC v2",
+      "pnl": 0.0,
+      "trades": 2,
+      "win_rate": 0.0,
+      "pf": null
+    },
+    {
+      "bot_name": "SOL ROC v2",
+      "pnl": 0.0,
+      "trades": 3,
+      "win_rate": 0.0,
+      "pf": null
+    },
+    {
+      "bot_name": "BTC Gaussian v10",
+      "pnl": 0.0,
+      "trades": 3,
+      "win_rate": 0.0,
+      "pf": null
+    },
+    {
+      "bot_name": "BTC Gaussian v8",
+      "pnl": 0.0,
+      "trades": 2,
+      "win_rate": 0.0,
+      "pf": null
+    }
+  ]
+}

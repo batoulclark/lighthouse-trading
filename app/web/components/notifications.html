@@ -1,0 +1,1164 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║          LIGHTHOUSE TRADING — NOTIFICATION SYSTEM           ║
+  ║  Self-contained component: notification center + toasts     ║
+  ║                                                              ║
+  ║  Exported globals:                                           ║
+  ║    addNotification(type, message, data)                      ║
+  ║    showToast(message, type, duration)                        ║
+  ║    getUnreadCount()                                          ║
+  ║    renderNotificationCenter(containerId)                     ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+<style>
+  /* ─── CSS Custom Properties ──────────────────────────────────── */
+  :root {
+    --lh-bg-primary:    #0d1117;
+    --lh-bg-secondary:  #161b22;
+    --lh-bg-tertiary:   #1c2128;
+    --lh-border:        #30363d;
+    --lh-text-primary:  #e6edf3;
+    --lh-text-muted:    #8b949e;
+    --lh-accent-blue:   #388bfd;
+    --lh-accent-green:  #3fb950;
+    --lh-accent-red:    #f85149;
+    --lh-accent-amber:  #d29922;
+    --lh-accent-purple: #bc8cff;
+    --lh-accent-teal:   #39c5cf;
+    --lh-shadow:        0 8px 32px rgba(0,0,0,0.5);
+    --lh-radius:        10px;
+    --lh-transition:    0.2s cubic-bezier(0.16,1,0.3,1);
+    --toast-width:      340px;
+  }
+
+  /* ─── Bell Button ────────────────────────────────────────────── */
+  .lh-bell-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lh-bell-btn {
+    background: none;
+    border: 1px solid var(--lh-border);
+    border-radius: 8px;
+    color: var(--lh-text-muted);
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all var(--lh-transition);
+    outline: none;
+  }
+  .lh-bell-btn:hover {
+    background: var(--lh-bg-tertiary);
+    color: var(--lh-text-primary);
+    border-color: #484f58;
+  }
+  .lh-bell-btn.has-unread {
+    color: var(--lh-accent-blue);
+    border-color: var(--lh-accent-blue);
+    animation: lh-bell-ring 0.6s ease both;
+  }
+  @keyframes lh-bell-ring {
+    0%   { transform: rotate(0deg); }
+    15%  { transform: rotate(14deg); }
+    30%  { transform: rotate(-12deg); }
+    45%  { transform: rotate(10deg); }
+    60%  { transform: rotate(-8deg); }
+    75%  { transform: rotate(5deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  /* Badge */
+  .lh-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    border-radius: 9px;
+    background: var(--lh-accent-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--lh-bg-primary);
+    pointer-events: none;
+    transition: transform var(--lh-transition);
+    transform-origin: top right;
+  }
+  .lh-badge.hidden {
+    transform: scale(0);
+    opacity: 0;
+  }
+  .lh-badge.pop {
+    animation: lh-badge-pop 0.35s var(--lh-transition);
+  }
+  @keyframes lh-badge-pop {
+    0%   { transform: scale(0); }
+    60%  { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* ─── Dropdown Panel ─────────────────────────────────────────── */
+  .lh-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 380px;
+    max-width: 95vw;
+    background: var(--lh-bg-secondary);
+    border: 1px solid var(--lh-border);
+    border-radius: var(--lh-radius);
+    box-shadow: var(--lh-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+    z-index: 9999;
+    transform-origin: top right;
+    transform: scale(0.95) translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform var(--lh-transition), opacity var(--lh-transition);
+  }
+  .lh-panel.open {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Panel header */
+  .lh-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--lh-border);
+    gap: 8px;
+  }
+  .lh-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lh-text-primary);
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lh-panel-title .count-pill {
+    background: var(--lh-bg-tertiary);
+    border: 1px solid var(--lh-border);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    color: var(--lh-text-muted);
+  }
+  .lh-panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .lh-icon-btn {
+    background: none;
+    border: none;
+    color: var(--lh-text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 4px 6px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: background var(--lh-transition), color var(--lh-transition);
+    white-space: nowrap;
+    outline: none;
+  }
+  .lh-icon-btn:hover {
+    background: var(--lh-bg-tertiary);
+    color: var(--lh-text-primary);
+  }
+  .lh-icon-btn.muted { color: var(--lh-accent-amber); }
+  .lh-icon-btn.muted:hover { color: var(--lh-text-primary); }
+
+  /* Filter tabs */
+  .lh-filter-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 8px 12px 0;
+    border-bottom: 1px solid var(--lh-border);
+  }
+  .lh-tab {
+    background: none;
+    border: none;
+    color: var(--lh-text-muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px 6px 0 0;
+    border-bottom: 2px solid transparent;
+    transition: all var(--lh-transition);
+    outline: none;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .lh-tab:hover { color: var(--lh-text-primary); }
+  .lh-tab.active {
+    color: var(--lh-accent-blue);
+    border-bottom-color: var(--lh-accent-blue);
+    background: rgba(56,139,253,0.05);
+  }
+
+  /* Notification list */
+  .lh-notif-list {
+    overflow-y: auto;
+    max-height: 380px;
+    padding: 4px 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--lh-border) transparent;
+  }
+  .lh-notif-list::-webkit-scrollbar { width: 4px; }
+  .lh-notif-list::-webkit-scrollbar-track { background: transparent; }
+  .lh-notif-list::-webkit-scrollbar-thumb { background: var(--lh-border); border-radius: 2px; }
+
+  .lh-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: var(--lh-text-muted);
+    font-size: 12px;
+  }
+  .lh-empty svg { opacity: 0.3; margin-bottom: 8px; }
+
+  /* Individual notification item */
+  .lh-notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background var(--lh-transition);
+    position: relative;
+    border-left: 3px solid transparent;
+  }
+  .lh-notif-item:hover { background: var(--lh-bg-tertiary); }
+  .lh-notif-item.unread { background: rgba(56,139,253,0.04); }
+  .lh-notif-item.unread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+  }
+  /* Type-specific left border */
+  .lh-notif-item.type-signal_received.unread::before   { background: var(--lh-accent-blue); }
+  .lh-notif-item.type-kill_switch.unread::before       { background: var(--lh-accent-red); }
+  .lh-notif-item.type-stale_warning.unread::before     { background: var(--lh-accent-amber); }
+  .lh-notif-item.type-system_alert.unread::before      { background: var(--lh-accent-purple); }
+  .lh-notif-item.type-trade_executed.unread::before    { background: var(--lh-accent-green); }
+
+  /* Icon bubble */
+  .lh-notif-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+  }
+  .icon-signal_received  { background: rgba(56,139,253,0.15);  color: var(--lh-accent-blue); }
+  .icon-kill_switch      { background: rgba(248,81,73,0.15);   color: var(--lh-accent-red); }
+  .icon-stale_warning    { background: rgba(210,153,34,0.15);  color: var(--lh-accent-amber); }
+  .icon-system_alert     { background: rgba(188,140,255,0.15); color: var(--lh-accent-purple); }
+  .icon-trade_executed   { background: rgba(63,185,80,0.15);   color: var(--lh-accent-green); }
+
+  /* Text content */
+  .lh-notif-content { flex: 1; min-width: 0; }
+  .lh-notif-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--lh-text-primary);
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .lh-notif-title .type-label {
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 5px;
+    border-radius: 4px;
+    opacity: 0.85;
+  }
+  .lh-type-label-signal_received  { background: rgba(56,139,253,0.2);  color: var(--lh-accent-blue); }
+  .lh-type-label-kill_switch      { background: rgba(248,81,73,0.2);   color: var(--lh-accent-red); }
+  .lh-type-label-stale_warning    { background: rgba(210,153,34,0.2);  color: var(--lh-accent-amber); }
+  .lh-type-label-system_alert     { background: rgba(188,140,255,0.2); color: var(--lh-accent-purple); }
+  .lh-type-label-trade_executed   { background: rgba(63,185,80,0.2);   color: var(--lh-accent-green); }
+
+  .lh-notif-msg {
+    font-size: 11.5px;
+    color: var(--lh-text-muted);
+    line-height: 1.45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lh-notif-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+  .lh-notif-time {
+    font-size: 10px;
+    color: var(--lh-text-muted);
+    opacity: 0.7;
+  }
+  .lh-unread-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--lh-accent-blue);
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* Trade data badge */
+  .lh-trade-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    letter-spacing: 0.03em;
+  }
+  .lh-trade-badge.buy  { background: rgba(63,185,80,0.2);  color: var(--lh-accent-green); }
+  .lh-trade-badge.sell { background: rgba(248,81,73,0.2);  color: var(--lh-accent-red); }
+
+  /* Panel footer */
+  .lh-panel-footer {
+    padding: 8px 14px;
+    border-top: 1px solid var(--lh-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .lh-footer-info {
+    font-size: 10px;
+    color: var(--lh-text-muted);
+  }
+  .lh-clear-btn {
+    font-size: 10px;
+    background: none;
+    border: 1px solid var(--lh-border);
+    color: var(--lh-text-muted);
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 3px 8px;
+    transition: all var(--lh-transition);
+    outline: none;
+    font-family: inherit;
+  }
+  .lh-clear-btn:hover {
+    border-color: var(--lh-accent-red);
+    color: var(--lh-accent-red);
+    background: rgba(248,81,73,0.06);
+  }
+
+  /* ─── Toast Container ────────────────────────────────────────── */
+  #lh-toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    width: var(--toast-width);
+    max-width: calc(100vw - 32px);
+  }
+
+  /* Individual toast */
+  .lh-toast {
+    background: var(--lh-bg-secondary);
+    border: 1px solid var(--lh-border);
+    border-radius: var(--lh-radius);
+    box-shadow: var(--lh-shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    pointer-events: all;
+    transform: translateX(calc(100% + 24px));
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.35s ease;
+    position: relative;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+  }
+  .lh-toast.visible {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .lh-toast.dismissing {
+    transform: translateX(calc(100% + 24px));
+    opacity: 0;
+    margin-bottom: -60px; /* collapse height */
+    transition: transform 0.3s ease, opacity 0.3s ease, margin-bottom 0.3s ease 0.1s;
+  }
+
+  /* Toast progress bar */
+  .lh-toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 100%;
+    transform-origin: left;
+    border-radius: 0 0 0 var(--lh-radius);
+    animation: lh-progress-shrink linear forwards;
+  }
+  @keyframes lh-progress-shrink {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+  }
+
+  /* Toast type colors */
+  .lh-toast.success .lh-toast-icon  { color: var(--lh-accent-green); }
+  .lh-toast.success .lh-toast-progress { background: var(--lh-accent-green); }
+  .lh-toast.success { border-left: 3px solid var(--lh-accent-green); }
+
+  .lh-toast.error .lh-toast-icon    { color: var(--lh-accent-red); }
+  .lh-toast.error .lh-toast-progress { background: var(--lh-accent-red); }
+  .lh-toast.error { border-left: 3px solid var(--lh-accent-red); }
+
+  .lh-toast.info .lh-toast-icon     { color: var(--lh-accent-blue); }
+  .lh-toast.info .lh-toast-progress { background: var(--lh-accent-blue); }
+  .lh-toast.info { border-left: 3px solid var(--lh-accent-blue); }
+
+  .lh-toast.warning .lh-toast-icon  { color: var(--lh-accent-amber); }
+  .lh-toast.warning .lh-toast-progress { background: var(--lh-accent-amber); }
+  .lh-toast.warning { border-left: 3px solid var(--lh-accent-amber); }
+
+  .lh-toast-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .lh-toast-body { flex: 1; min-width: 0; }
+  .lh-toast-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--lh-text-primary);
+    margin-bottom: 2px;
+  }
+  .lh-toast-msg {
+    font-size: 11.5px;
+    color: var(--lh-text-muted);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+  .lh-toast-close {
+    background: none;
+    border: none;
+    color: var(--lh-text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 1px;
+    opacity: 0.6;
+    transition: opacity var(--lh-transition);
+    outline: none;
+  }
+  .lh-toast-close:hover { opacity: 1; }
+
+  /* Trade toast extras */
+  .lh-toast-trade {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+  }
+  .lh-toast-pair {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--lh-text-primary);
+    letter-spacing: 0.02em;
+  }
+  .lh-toast-price {
+    font-size: 11px;
+    color: var(--lh-text-muted);
+    font-family: 'Courier New', monospace;
+  }
+</style>
+
+<!-- Toast container (always in DOM) -->
+<div id="lh-toast-container"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   LIGHTHOUSE NOTIFICATION SYSTEM
+   Version 2.0 — self-contained, no dependencies
+═══════════════════════════════════════════════════════════════ */
+(function() {
+  'use strict';
+
+  /* ── Constants ─────────────────────────────────────────────── */
+  const STORAGE_KEY  = 'lh_notifications_v2';
+  const MAX_STORED   = 100;
+  const SOUND_KEY    = 'lh_sound_enabled';
+
+  /* ── State ─────────────────────────────────────────────────── */
+  const state = {
+    notifications:  [],
+    isPanelOpen:    false,
+    activeFilter:   'all',
+    soundEnabled:   localStorage.getItem(SOUND_KEY) !== 'false',
+    panelEl:        null,
+    bellEl:         null,
+    badgeEl:        null,
+    audioCtx:       null,
+  };
+
+  /* ── Type metadata ─────────────────────────────────────────── */
+  const TYPE_META = {
+    signal_received: { icon: '📡', label: 'Signal',  toastType: 'info'    },
+    kill_switch:     { icon: '🔴', label: 'KillSwt', toastType: 'error'   },
+    stale_warning:   { icon: '⚠️', label: 'Stale',   toastType: 'warning' },
+    system_alert:    { icon: '🔔', label: 'System',  toastType: 'info'    },
+    trade_executed:  { icon: '💹', label: 'Trade',   toastType: 'success' },
+  };
+
+  /* ── Helpers ───────────────────────────────────────────────── */
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function relativeTime(ts) {
+    const delta = Math.floor((Date.now() - ts) / 1000);
+    if (delta < 5)   return 'just now';
+    if (delta < 60)  return `${delta}s ago`;
+    if (delta < 3600) return `${Math.floor(delta/60)}m ago`;
+    if (delta < 86400) return `${Math.floor(delta/3600)}h ago`;
+    return new Date(ts).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  }
+
+  function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  /* ── localStorage persistence ──────────────────────────────── */
+  function loadNotifications() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) state.notifications = JSON.parse(raw);
+    } catch(e) {
+      state.notifications = [];
+    }
+  }
+
+  function saveNotifications() {
+    try {
+      // Keep newest MAX_STORED
+      const trimmed = state.notifications.slice(-MAX_STORED);
+      state.notifications = trimmed;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+    } catch(e) {}
+  }
+
+  /* ── Web Audio: beep generation ────────────────────────────── */
+  function getAudioContext() {
+    if (!state.audioCtx) {
+      try {
+        state.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch(e) {}
+    }
+    return state.audioCtx;
+  }
+
+  function playBeep(type) {
+    if (!state.soundEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+
+    const configs = {
+      // Buy: ascending two-tone chime
+      buy: [
+        { freq: 523.25, start: 0,    dur: 0.12, vol: 0.3 },
+        { freq: 659.25, start: 0.12, dur: 0.14, vol: 0.25 },
+        { freq: 783.99, start: 0.24, dur: 0.2,  vol: 0.2  },
+      ],
+      // Sell: descending two-tone
+      sell: [
+        { freq: 783.99, start: 0,    dur: 0.12, vol: 0.3 },
+        { freq: 659.25, start: 0.12, dur: 0.14, vol: 0.25 },
+        { freq: 523.25, start: 0.24, dur: 0.2,  vol: 0.2  },
+      ],
+      // Alert: single mid-tone
+      alert: [
+        { freq: 880, start: 0,   dur: 0.08, vol: 0.2 },
+        { freq: 880, start: 0.1, dur: 0.08, vol: 0.15 },
+      ],
+      // Signal: quick ping
+      signal: [
+        { freq: 1046.5, start: 0,   dur: 0.1, vol: 0.2 },
+        { freq: 1174.7, start: 0.1, dur: 0.12, vol: 0.15 },
+      ],
+      // Kill: urgent low
+      kill: [
+        { freq: 220, start: 0,    dur: 0.15, vol: 0.4 },
+        { freq: 185, start: 0.18, dur: 0.2,  vol: 0.35 },
+      ],
+    };
+
+    const notes = configs[type] || configs.signal;
+    notes.forEach(({ freq, start, dur, vol }) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + start);
+      gain.gain.setValueAtTime(0, now + start);
+      gain.gain.linearRampToValueAtTime(vol, now + start + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+      osc.start(now + start);
+      osc.stop(now + start + dur + 0.01);
+    });
+  }
+
+  function playSoundForType(type, data) {
+    if (type === 'trade_executed') {
+      const side = data && data.side ? data.side.toLowerCase() : 'buy';
+      playBeep(side === 'sell' ? 'sell' : 'buy');
+    } else if (type === 'kill_switch') {
+      playBeep('kill');
+    } else if (type === 'signal_received') {
+      playBeep('signal');
+    } else {
+      playBeep('alert');
+    }
+  }
+
+  /* ── Core: addNotification ─────────────────────────────────── */
+  window.addNotification = function(type, message, data = {}) {
+    const notif = {
+      id:        uid(),
+      type:      type || 'system_alert',
+      message:   message || '',
+      data:      data,
+      timestamp: Date.now(),
+      read:      false,
+    };
+
+    state.notifications.push(notif);
+    saveNotifications();
+    refreshBell();
+
+    // If panel is open, re-render list
+    if (state.isPanelOpen && state.panelEl) renderList();
+
+    // Sound
+    playSoundForType(notif.type, notif.data);
+
+    // Auto-show toast for important types
+    const meta = TYPE_META[notif.type] || { toastType: 'info', icon: '🔔' };
+    const toastType = notif.type === 'kill_switch'    ? 'error'
+                    : notif.type === 'stale_warning'  ? 'warning'
+                    : notif.type === 'trade_executed' ? 'success'
+                    : 'info';
+
+    if (notif.type === 'trade_executed' && data.side) {
+      // Rich trade toast
+      showTradeToast(notif, data);
+    } else {
+      showToast(message, toastType);
+    }
+
+    return notif.id;
+  };
+
+  /* ── Core: getUnreadCount ──────────────────────────────────── */
+  window.getUnreadCount = function() {
+    return state.notifications.filter(n => !n.read).length;
+  };
+
+  /* ── Core: showToast ───────────────────────────────────────── */
+  window.showToast = function(message, type = 'info', duration = 5000) {
+    const container = document.getElementById('lh-toast-container');
+    if (!container) return;
+
+    const toastIcons = {
+      success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️',
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `lh-toast ${type}`;
+    toast.innerHTML = `
+      <span class="lh-toast-icon">${toastIcons[type] || 'ℹ️'}</span>
+      <div class="lh-toast-body">
+        <div class="lh-toast-title">${escHtml(capitalizeFirst(type))}</div>
+        <div class="lh-toast-msg">${escHtml(message)}</div>
+      </div>
+      <button class="lh-toast-close" onclick="this.closest('.lh-toast')._dismiss()">✕</button>
+      <div class="lh-toast-progress" style="animation-duration:${duration}ms"></div>
+    `;
+
+    const dismiss = () => {
+      toast.classList.add('dismissing');
+      setTimeout(() => toast.remove(), 450);
+    };
+    toast._dismiss = dismiss;
+
+    container.appendChild(toast);
+    // Force reflow for transition
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('visible')));
+
+    const timer = setTimeout(dismiss, duration);
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => setTimeout(dismiss, 1500));
+
+    return toast;
+  };
+
+  function showTradeToast(notif, data) {
+    const container = document.getElementById('lh-toast-container');
+    if (!container) return;
+
+    const isBuy = (data.side || '').toUpperCase() === 'BUY';
+    const dir   = isBuy ? 'buy' : 'sell';
+    const icon  = isBuy ? '🟢' : '🔴';
+    const duration = 6000;
+
+    const toast = document.createElement('div');
+    toast.className = `lh-toast ${isBuy ? 'success' : 'error'}`;
+    toast.innerHTML = `
+      <span class="lh-toast-icon">${icon}</span>
+      <div class="lh-toast-body">
+        <div class="lh-toast-title">Trade Executed</div>
+        <div class="lh-toast-msg">${escHtml(notif.message)}</div>
+        <div class="lh-toast-trade">
+          <span class="lh-trade-badge ${dir}">${escHtml((data.side||'').toUpperCase())}</span>
+          ${data.pair ? `<span class="lh-toast-pair">${escHtml(data.pair)}</span>` : ''}
+          ${data.price ? `<span class="lh-toast-price">@ ${escHtml(String(data.price))}</span>` : ''}
+          ${data.qty  ? `<span class="lh-toast-price">· ${escHtml(String(data.qty))}</span>` : ''}
+        </div>
+      </div>
+      <button class="lh-toast-close" onclick="this.closest('.lh-toast')._dismiss()">✕</button>
+      <div class="lh-toast-progress" style="animation-duration:${duration}ms"></div>
+    `;
+
+    const dismiss = () => {
+      toast.classList.add('dismissing');
+      setTimeout(() => toast.remove(), 450);
+    };
+    toast._dismiss = dismiss;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => requestAnimationFrame(() => toast.classList.add('visible')));
+    const timer = setTimeout(dismiss, duration);
+    toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    toast.addEventListener('mouseleave', () => setTimeout(dismiss, 1500));
+  }
+
+  /* ── Core: renderNotificationCenter ────────────────────────── */
+  window.renderNotificationCenter = function(containerId) {
+    const container = typeof containerId === 'string'
+      ? document.getElementById(containerId)
+      : containerId;
+
+    if (!container) {
+      console.warn('[LH Notifications] Container not found:', containerId);
+      return;
+    }
+
+    container.innerHTML = buildBellHTML();
+    bindBellEvents(container);
+
+    state.bellEl  = container.querySelector('.lh-bell-btn');
+    state.badgeEl = container.querySelector('.lh-badge');
+    state.panelEl = container.querySelector('.lh-panel');
+
+    refreshBell();
+  };
+
+  /* ── Bell HTML builder ─────────────────────────────────────── */
+  function buildBellHTML() {
+    return `
+    <div class="lh-bell-wrapper">
+      <button class="lh-bell-btn" id="lh-bell-btn" aria-label="Notifications" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7a5.002 5.002 0 0 0-3.005-4.901z"/>
+        </svg>
+      </button>
+      <span class="lh-badge hidden" id="lh-badge">0</span>
+
+      <div class="lh-panel" id="lh-panel">
+        <!-- Header -->
+        <div class="lh-panel-header">
+          <span class="lh-panel-title">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:0.7">
+              <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7a5.002 5.002 0 0 0-3.005-4.901z"/>
+            </svg>
+            Notifications
+            <span class="count-pill" id="lh-count-pill">0</span>
+          </span>
+          <div class="lh-panel-actions">
+            <button class="lh-icon-btn" id="lh-sound-btn" title="Toggle sounds">
+              🔔 <span id="lh-sound-label">Sound</span>
+            </button>
+            <button class="lh-icon-btn" id="lh-mark-all-btn" title="Mark all as read">
+              ✓ All Read
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="lh-filter-tabs">
+          <button class="lh-tab active" data-filter="all">All</button>
+          <button class="lh-tab" data-filter="trade_executed">Trades</button>
+          <button class="lh-tab" data-filter="signal_received">Signals</button>
+          <button class="lh-tab" data-filter="kill_switch">KillSwitch</button>
+          <button class="lh-tab" data-filter="stale_warning">Stale</button>
+        </div>
+
+        <!-- Notification list -->
+        <div class="lh-notif-list" id="lh-notif-list"></div>
+
+        <!-- Footer -->
+        <div class="lh-panel-footer">
+          <span class="lh-footer-info" id="lh-footer-info">No notifications</span>
+          <button class="lh-clear-btn" id="lh-clear-btn">Clear All</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  /* ── Bind events ───────────────────────────────────────────── */
+  function bindBellEvents(container) {
+    const bell      = container.querySelector('#lh-bell-btn');
+    const panel     = container.querySelector('#lh-panel');
+    const markAllBtn= container.querySelector('#lh-mark-all-btn');
+    const clearBtn  = container.querySelector('#lh-clear-btn');
+    const soundBtn  = container.querySelector('#lh-sound-btn');
+    const tabs      = container.querySelectorAll('.lh-tab');
+
+    bell.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel(panel, bell);
+    });
+
+    markAllBtn.addEventListener('click', () => {
+      markAllRead();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      clearAll();
+    });
+
+    soundBtn.addEventListener('click', () => {
+      state.soundEnabled = !state.soundEnabled;
+      localStorage.setItem(SOUND_KEY, state.soundEnabled);
+      updateSoundBtn(soundBtn);
+      // Play a quick test beep if enabling
+      if (state.soundEnabled) playBeep('signal');
+    });
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        state.activeFilter = tab.dataset.filter;
+        renderList();
+      });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (state.isPanelOpen && !container.contains(e.target)) {
+        closePanel(panel, bell);
+      }
+    });
+
+    // Keyboard: Escape closes
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && state.isPanelOpen) {
+        closePanel(panel, bell);
+        bell.focus();
+      }
+    });
+
+    updateSoundBtn(soundBtn);
+  }
+
+  function updateSoundBtn(btn) {
+    if (!btn) return;
+    const label = btn.querySelector('#lh-sound-label');
+    if (state.soundEnabled) {
+      btn.classList.remove('muted');
+      btn.title = 'Sounds ON — click to mute';
+      if (label) label.textContent = 'Sound';
+      btn.childNodes[0].textContent = '🔔 ';
+    } else {
+      btn.classList.add('muted');
+      btn.title = 'Sounds MUTED — click to enable';
+      if (label) label.textContent = 'Muted';
+      btn.childNodes[0].textContent = '🔕 ';
+    }
+  }
+
+  function togglePanel(panel, bell) {
+    state.isPanelOpen ? closePanel(panel, bell) : openPanel(panel, bell);
+  }
+
+  function openPanel(panel, bell) {
+    state.isPanelOpen = true;
+    panel.classList.add('open');
+    bell.setAttribute('aria-expanded', 'true');
+    renderList();
+  }
+
+  function closePanel(panel, bell) {
+    state.isPanelOpen = false;
+    panel.classList.remove('open');
+    bell.setAttribute('aria-expanded', 'false');
+  }
+
+  /* ── Render notification list ──────────────────────────────── */
+  function renderList() {
+    const listEl = document.getElementById('lh-notif-list');
+    if (!listEl) return;
+
+    const filter = state.activeFilter;
+    const items = [...state.notifications].reverse().filter(n => {
+      if (filter === 'all') return true;
+      return n.type === filter;
+    });
+
+    updateFooter(items.length);
+
+    if (items.length === 0) {
+      listEl.innerHTML = `
+        <div class="lh-empty">
+          <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor" style="display:block;margin:0 auto 8px">
+            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zm.995-14.901a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 6c0 1.098-.5 6-2 7h14c-1.5-1-2-5.902-2-7a5.002 5.002 0 0 0-3.005-4.901z"/>
+          </svg>
+          No ${filter === 'all' ? '' : filter.replace('_', ' ')} notifications
+        </div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map(n => buildNotifItemHTML(n)).join('');
+
+    // Bind click handlers
+    listEl.querySelectorAll('.lh-notif-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const id = el.dataset.id;
+        markRead(id);
+      });
+    });
+  }
+
+  function buildNotifItemHTML(n) {
+    const meta = TYPE_META[n.type] || { icon: '🔔', label: '???', toastType: 'info' };
+    const tradeHTML = (n.type === 'trade_executed' && n.data && n.data.side) ? `
+      <span class="lh-trade-badge ${n.data.side.toLowerCase()}">${escHtml(n.data.side.toUpperCase())}</span>
+      ${n.data.pair  ? `<strong style="font-size:11px;color:var(--lh-text-primary)">${escHtml(n.data.pair)}</strong>` : ''}
+      ${n.data.price ? `<span style="font-size:10px;color:var(--lh-text-muted);font-family:monospace">@ ${escHtml(String(n.data.price))}</span>` : ''}
+    ` : '';
+
+    return `
+      <div class="lh-notif-item ${n.read ? '' : 'unread'} type-${escHtml(n.type)}"
+           data-id="${escHtml(n.id)}" role="button" tabindex="0">
+        <div class="lh-notif-icon icon-${escHtml(n.type)}">${meta.icon}</div>
+        <div class="lh-notif-content">
+          <div class="lh-notif-title">
+            ${escHtml(n.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))}
+            <span class="type-label lh-type-label-${escHtml(n.type)}">${meta.label}</span>
+          </div>
+          ${tradeHTML ? `<div style="display:flex;align-items:center;gap:5px;margin:3px 0">${tradeHTML}</div>` : ''}
+          <div class="lh-notif-msg">${escHtml(n.message)}</div>
+          <div class="lh-notif-meta">
+            <span class="lh-notif-time">${relativeTime(n.timestamp)}</span>
+          </div>
+        </div>
+        ${!n.read ? '<div class="lh-unread-dot"></div>' : ''}
+      </div>`;
+  }
+
+  /* ── Mark read / unread ────────────────────────────────────── */
+  function markRead(id) {
+    const notif = state.notifications.find(n => n.id === id);
+    if (notif && !notif.read) {
+      notif.read = true;
+      saveNotifications();
+      refreshBell();
+      renderList();
+    }
+  }
+
+  function markAllRead() {
+    let changed = false;
+    state.notifications.forEach(n => {
+      if (!n.read) { n.read = true; changed = true; }
+    });
+    if (changed) {
+      saveNotifications();
+      refreshBell();
+      renderList();
+    }
+  }
+
+  function clearAll() {
+    state.notifications = [];
+    saveNotifications();
+    refreshBell();
+    renderList();
+  }
+
+  /* ── Bell / badge refresh ──────────────────────────────────── */
+  function refreshBell() {
+    const count = getUnreadCount();
+
+    if (state.badgeEl) {
+      const wasHidden = state.badgeEl.classList.contains('hidden');
+      state.badgeEl.textContent = count > 99 ? '99+' : String(count);
+      if (count === 0) {
+        state.badgeEl.classList.add('hidden');
+      } else {
+        state.badgeEl.classList.remove('hidden');
+        if (wasHidden) {
+          // Trigger pop animation
+          state.badgeEl.classList.remove('pop');
+          void state.badgeEl.offsetWidth; // reflow
+          state.badgeEl.classList.add('pop');
+        }
+      }
+    }
+
+    if (state.bellEl) {
+      count > 0
+        ? state.bellEl.classList.add('has-unread')
+        : state.bellEl.classList.remove('has-unread');
+    }
+
+    // Update count pill in panel header
+    const pill = document.getElementById('lh-count-pill');
+    if (pill) pill.textContent = String(state.notifications.length);
+  }
+
+  function updateFooter(shownCount) {
+    const info = document.getElementById('lh-footer-info');
+    if (!info) return;
+    const unread = getUnreadCount();
+    if (state.notifications.length === 0) {
+      info.textContent = 'No notifications';
+    } else if (unread > 0) {
+      info.textContent = `${unread} unread · ${shownCount} shown`;
+    } else {
+      info.textContent = `${shownCount} notifications · all read`;
+    }
+  }
+
+  /* ── Utility ───────────────────────────────────────────────── */
+  function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  /* ── Init ──────────────────────────────────────────────────── */
+  loadNotifications();
+
+  // Also expose to window for external usage
+  window.LighthouseNotifications = {
+    addNotification:          window.addNotification,
+    showToast:                window.showToast,
+    getUnreadCount:           window.getUnreadCount,
+    renderNotificationCenter: window.renderNotificationCenter,
+    markAllRead,
+    clearAll,
+    playBeep,
+  };
+
+})();
+</script>
+
+<!--
+  ══════════════════════════════════════════════════════
+  USAGE EXAMPLE (copy this into your dashboard HTML)
+  ══════════════════════════════════════════════════════
+
+  1. Include this file in your page:
+     <link rel="stylesheet" href="components/notifications.html"> ← NOT this
+     — instead, use a server-side include or fetch+inject:
+
+     fetch('/components/notifications.html')
+       .then(r => r.text())
+       .then(html => {
+         document.body.insertAdjacentHTML('beforeend', html);
+         // Now render the bell wherever you want:
+         renderNotificationCenter('my-nav-notif-slot');
+       });
+
+  2. Add a slot in your top nav:
+     <div id="my-nav-notif-slot"></div>
+
+  3. Fire notifications:
+     addNotification('signal_received', 'BTC/USD signal fired: RSI oversold', {
+       pair: 'BTC/USD', strategy: 'rsi_mean_revert'
+     });
+
+     addNotification('trade_executed', 'Bought 0.05 BTC at 68,420', {
+       side: 'BUY', pair: 'BTC/USDT', price: 68420, qty: 0.05
+     });
+
+     addNotification('kill_switch', 'Kill switch triggered: drawdown > 5%', {
+       threshold: 0.05, currentDD: 0.062
+     });
+
+     addNotification('stale_warning', 'No signal for ETHUSDT in 2h', {
+       pair: 'ETH/USDT', lastSeen: Date.now() - 7200000
+     });
+
+     addNotification('system_alert', 'WebSocket reconnected after 3 retries', {});
+
+  4. Show standalone toast:
+     showToast('Position closed: +$142.50', 'success');
+     showToast('Exchange API timeout', 'error');
+     showToast('Margin level below 150%', 'warning');
+     showToast('New strategy loaded: Grid_v3', 'info', 8000);
+
+  5. Check unread:
+     const n = getUnreadCount(); // → number
+
+  ══════════════════════════════════════════════════════
+-->

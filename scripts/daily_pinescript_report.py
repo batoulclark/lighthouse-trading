@@ -117,7 +117,7 @@ def main():
     )
 
     result = subprocess.run(
-        ["openclaw", "message", "send",
+        ["/home/yaraclawd/.npm-global/bin/openclaw", "message", "send",
          "--channel", "telegram", "--account", "luna",
          "--target", CHAT_ID,
          "--media", docx_path,

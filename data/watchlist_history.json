@@ -1,0 +1,79 @@
+[
+  {
+    "timestamp": "2026-03-19T23:02:53.318460+00:00",
+    "coins": [
+      {
+        "symbol": "FTM/USDT",
+        "score": 79.2,
+        "price": 0.42,
+        "roc_30": 15.3,
+        "roc_asymmetry": 2.4,
+        "price_multiple": 12.5,
+        "volume_24h": null,
+        "trend": "bullish",
+        "flagged": true,
+        "details": null
+      },
+      {
+        "symbol": "MATIC/USDT",
+        "score": 78.4,
+        "price": 0.38,
+        "roc_30": 8.7,
+        "roc_asymmetry": 2.1,
+        "price_multiple": 8.3,
+        "volume_24h": null,
+        "trend": "bullish",
+        "flagged": true,
+        "details": null
+      },
+      {
+        "symbol": "SOL/USDT",
+        "score": 70.7,
+        "price": 137.5,
+        "roc_30": 3.4,
+        "roc_asymmetry": 2.3,
+        "price_multiple": 45.8,
+        "volume_24h": null,
+        "trend": "bullish",
+        "flagged": true,
+        "details": null
+      },
+      {
+        "symbol": "DOGE/USDT",
+        "score": 65.1,
+        "price": 0.085,
+        "roc_30": -2.1,
+        "roc_asymmetry": 1.8,
+        "price_multiple": 28.3,
+        "volume_24h": null,
+        "trend": "neutral",
+        "flagged": false,
+        "details": null
+      },
+      {
+        "symbol": "ADA/USDT",
+        "score": 55.3,
+        "price": 0.71,
+        "roc_30": 1.2,
+        "roc_asymmetry": 1.5,
+        "price_multiple": 3.2,
+        "volume_24h": null,
+        "trend": "neutral",
+        "flagged": false,
+        "details": null
+      },
+      {
+        "symbol": "XRP/USDT",
+        "score": 32.1,
+        "price": 2.45,
+        "roc_30": -5.2,
+        "roc_asymmetry": 0.9,
+        "price_multiple": 2.1,
+        "volume_24h": null,
+        "trend": "bearish",
+        "flagged": false,
+        "details": null
+      }
+    ]
+  }
+]

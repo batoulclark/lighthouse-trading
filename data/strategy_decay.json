@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-03-20T01:31:00.936744+00:00",
+  "bots": [
+    {
+      "bot_name": "BTC Gaussian v10",
+      "bot_id": "12e0b34e-18b0-4963-b244-81a0a8ed5ce6",
+      "alltime": {
+        "wr": 0.0,
+        "pf": null,
+        "sharpe": 0.0,
+        "trade_count": 3
+      },
+      "rolling_30d": {
+        "wr": 0.0,
+        "pf": null,
+        "sharpe": 0.0,
+        "trade_count": 3
+      },
+      "decaying": true,
+      "decay_reasons": [
+        "Sharpe ratio below 0.5 (rolling=0.00)"
+      ],
+      "first_trade": "2026-03-19",
+      "last_trade": "2026-03-19",
+      "days_of_history": 0,
+      "note": "Less than 30 days of history (0 days) \u2014 rolling metrics equal all-time metrics"
+    },
+    {
+      "bot_name": "BTC Gaussian v6",
+      "bot_id": "070f7314-be57-4241-9afb-d37eff3280a9",
+      "alltime": {
+        "wr": null,
+        "pf": null,
+        "sharpe": null,
+        "trade_count": 0
+      },
+      "rolling_30d": {
+        "wr": null,
+        "pf": null,
+        "sharpe": null,
+        "trade_count": 0
+      },
+      "decaying": false,
+      "decay_reasons": [],
+      "note": "Insufficient data: only 0 closed trade(s)"
+    },
+    {
+      "bot_name": "BTC Gaussian v7",
+      "bot_id": "0d670f2b-5d55-4b5b-ad0f-6860c872193e",
+      "alltime": {
+        "wr": 0.6,
+        "pf": 9999.0,
+        "sharpe": 16.7608,
+        "trade_count": 5
+      },
+      "rolling_30d": {
+        "wr": 0.6,
+        "pf": 9999.0,
+        "sharpe": 16.7608,
+        "trade_count": 5
+      },
+      "decaying": false,
+      "decay_reasons": [],
+      "first_trade": "2026-03-12",
+      "last_trade": "2026-03-18",
+      "days_of_history": 7,
+      "note": "Less than 30 days of history (7 days) \u2014 rolling metrics equal all-time metrics"
+    },
+    {
+      "bot_name": "ETH ROC v2",
+      "bot_id": "f8be3498-5511-4a22-a5c4-850b06064127",
+      "alltime": {
+        "wr": null,
+        "pf": null,
+        "sharpe": null,
+        "trade_count": 2
+      },
+      "rolling_30d": {
+        "wr": null,
+        "pf": null,
+        "sharpe": null,
+        "trade_count": 2
+      },
+      "decaying": false,
+      "decay_reasons": [],
+      "first_trade": "2026-03-19",
+      "last_trade": "2026-03-19",
+      "days_of_history": 0,
+      "note": "Insufficient data: only 2 closed trade(s)"
+    },
+    {
+      "bot_name": "SOL ROC v2",
+      "bot_id": "5481e736-d84b-41b7-ba5d-af5049e40370",
+      "alltime": {
+        "wr": 0.0,
+        "pf": null,
+        "sharpe": 0.0,
+        "trade_count": 3
+      },
+      "rolling_30d": {
+        "wr": 0.0,
+        "pf": null,
+        "sharpe": 0.0,
+        "trade_count": 3
+      },
+      "decaying": true,
+      "decay_reasons": [
+        "Sharpe ratio below 0.5 (rolling=0.00)"
+      ],
+      "first_trade": "2026-03-19",
+      "last_trade": "2026-03-19",
+      "days_of_history": 0,
+      "note": "Less than 30 days of history (0 days) \u2014 rolling metrics equal all-time metrics"
+    }
+  ],
+  "meta": {
+    "total_trades_fetched": 43,
+    "total_bots": 5,
+    "decaying_bot_count": 2,
+    "decaying_bots": [
+      "BTC Gaussian v10",
+      "SOL ROC v2"
+    ],
+    "rolling_window_days": 30,
+    "min_trades_for_metrics": 3,
+    "thresholds": {
+      "win_rate_drop_pp": 10.0,
+      "min_profit_factor": 1.0,
+      "min_sharpe": 0.5
+    }
+  }
+}

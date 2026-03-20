@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-03-20T01:31:09.890686+00:00",
+  "current_date": "2026-03-20",
+  "current_price": 70480.69,
+  "current_regime": "trending_up",
+  "volatility_30d": 51.23,
+  "trend_strength": {
+    "sma20": 70118.63,
+    "sma50": 69870.06,
+    "trend_pct": 0.3558,
+    "description": "bullish alignment"
+  },
+  "volume_profile": {
+    "vol_today": 1221.29,
+    "vol_30d_avg": 23805.36,
+    "vol_ratio": 0.0513
+  },
+  "regime_history": [
+    {
+      "date": "2026-03-01",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-02",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-03",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-04",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-05",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-06",
+      "regime": "high_volatility"
+    },
+    {
+      "date": "2026-03-07",
+      "regime": "trending_down"
+    },
+    {
+      "date": "2026-03-08",
+      "regime": "trending_down"
+    },
+    {
+      "date": "2026-03-09",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-10",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-11",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-12",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-13",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-14",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-15",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-16",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-17",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-18",
+      "regime": "range_bound"
+    },
+    {
+      "date": "2026-03-19",
+      "regime": "trending_down"
+    },
+    {
+      "date": "2026-03-20",
+      "regime": "trending_up"
+    }
+  ],
+  "strategy_fit": [
+    {
+      "strategy": "SOL ROC v2",
+      "strategy_type": "roc",
+      "pair": "SOLUSDT",
+      "current_regime_fit": "good"
+    },
+    {
+      "strategy": "ETH ROC v2",
+      "strategy_type": "roc",
+      "pair": "ETHUSDT",
+      "current_regime_fit": "good"
+    },
+    {
+      "strategy": "BTC Gaussian v10",
+      "strategy_type": "gaussian",
+      "pair": "BTCUSDT",
+      "current_regime_fit": "good"
+    },
+    {
+      "strategy": "DOGE ROC v1",
+      "strategy_type": "roc",
+      "pair": "DOGEUSDT",
+      "current_regime_fit": "good"
+    },
+    {
+      "strategy": "NEAR ROC v1",
+      "strategy_type": "roc",
+      "pair": "NEARUSDT",
+      "current_regime_fit": "good"
+    }
+  ]
+}

@@ -1583,18 +1583,6 @@
       color: var(--text);
     }
     .side-filter-btn:hover:not(.active) { color: var(--text-secondary); }
-
-    /* Settings panel helpers */
-    .risk-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--border-light);
-      font-size: .82rem;
-    }
-    .risk-row:last-child { border-bottom: none; }
-    .muted { color: var(--muted); }
   </style>
 </head>
 <body>
@@ -1655,7 +1643,6 @@
   <button class="tab-btn" data-tab="scanner" onclick="switchTab('scanner')">Scanner</button>
   <button class="tab-btn" data-tab="strategies" onclick="switchTab('strategies')">Strategies</button>
   <button class="tab-btn" data-tab="history" onclick="switchTab('history')">History</button>
-  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">⚙️</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
@@ -2058,60 +2045,6 @@
       <div class="pagination-wrap">
         <span class="page-info" id="hist-page-info"></span>
         <div class="pagination-btns" id="pagination"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<!-- TAB: SETTINGS                                                              -->
-<!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="tab-panel" id="panel-settings" style="padding:20px">
-  <h2 style="font-size:20px;font-weight:700;margin-bottom:16px">System Settings</h2>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:16px">
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Safety Thresholds</h3>
-      <div class="risk-row"><span class="muted">ESL Warning</span><span>15%</span></div>
-      <div class="risk-row"><span class="muted">ESL Critical</span><span>20%</span></div>
-      <div class="risk-row"><span class="muted">ESL Catastrophic</span><span>30%</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L1</span><span>1% daily</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L2</span><span>2% daily</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker L3</span><span>5% daily</span></div>
-      <div class="risk-row"><span class="muted">Dead Man Timeout</span><span>30 min</span></div>
-      <div class="risk-row"><span class="muted">Capital</span><span>$1,000</span></div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Cron Jobs</h3>
-      <div class="risk-row"><span class="muted">Watchdog v3</span><span>Every 5 min</span></div>
-      <div class="risk-row"><span class="muted">Circuit Breaker</span><span>Every 5 min</span></div>
-      <div class="risk-row"><span class="muted">Dead Man Switch</span><span>Every 10 min</span></div>
-      <div class="risk-row"><span class="muted">Dashboard Monitor</span><span>Every 15 min</span></div>
-      <div class="risk-row"><span class="muted">Luna Backup</span><span>Daily 06:00 UTC</span></div>
-      <div class="risk-row"><span class="muted">Signal Backup</span><span>Daily 00:05 UTC</span></div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">API Endpoints</h3>
-      <div id="settings-endpoints">Loading...</div>
-    </div>
-
-    <div class="card" style="padding:16px">
-      <h3 style="font-size:14px;font-weight:600;margin-bottom:12px">Go-Live Checklist</h3>
-      <div style="font-size:13px">
-        <div>✅ TradingView alerts connected</div>
-        <div>✅ Paper trading active</div>
-        <div>✅ Kill switch tested</div>
-        <div>✅ ESL configured (15/20/30%)</div>
-        <div>✅ Circuit breaker active</div>
-        <div>✅ Dead man's switch active</div>
-        <div>✅ Monitoring crons running</div>
-        <div>⏳ Hyperliquid testnet API keys</div>
-        <div>⏳ 30-day paper trading validation</div>
-        <div>⏳ Walk-forward OOS test</div>
-        <div style="margin-top:8px;font-weight:600">Target: April 15, 2026</div>
       </div>
     </div>
 

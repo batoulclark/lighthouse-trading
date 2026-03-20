@@ -18,7 +18,8 @@ from app.exchanges.base import Balance, BaseExchange, OrderResult, Position
 logger = logging.getLogger(__name__)
 
 _PAPER_TRADES_FILE = os.getenv("PAPER_TRADES_FILE", "data/paper_trades.json")
-_STARTING_BALANCE = float(os.getenv("PAPER_STARTING_BALANCE", "10000"))
+_STARTING_BALANCE = float(os.getenv("PAPER_STARTING_BALANCE", "3000"))
+_PER_BOT_BALANCE = float(os.getenv("PAPER_PER_BOT_BALANCE", "1000"))
 
 
 class PaperExchange(BaseExchange):
@@ -35,6 +36,7 @@ class PaperExchange(BaseExchange):
         self,
         starting_balance: float = _STARTING_BALANCE,
         trades_file: str = _PAPER_TRADES_FILE,
+        per_bot_balance: float = _PER_BOT_BALANCE,
     ) -> None:
         self._trades_file = trades_file
         self._positions: Dict[str, Dict[str, Any]] = {}   # symbol → position dict
@@ -42,6 +44,9 @@ class PaperExchange(BaseExchange):
         self._last_price: Dict[str, float] = {}           # symbol → last known price
         self._balance = starting_balance
         self._starting_balance = starting_balance
+        self._per_bot_balance = per_bot_balance
+        self._bot_balances: Dict[str, float] = {}          # bot_id → balance
+        self._bot_starting: Dict[str, float] = {}          # bot_id → starting balance
 
         # Ensure data directory exists
         os.makedirs(os.path.dirname(self._trades_file) or ".", exist_ok=True)
@@ -91,6 +96,9 @@ class PaperExchange(BaseExchange):
             )
 
         cost = fill_price * size
+        bot_id = getattr(self, '_active_bot_id', None)
+        if bot_id and bot_id in self._bot_balances:
+            self._bot_balances[bot_id] -= cost
         self._balance -= cost
 
         self._positions[symbol] = {
@@ -204,6 +212,13 @@ class PaperExchange(BaseExchange):
             pnl = (entry_price - exit_price) * size
             self._balance -= entry_price * size - pnl  # return notional + profit (short)
 
+        bot_id = getattr(self, '_active_bot_id', None)
+        if bot_id and bot_id in self._bot_balances:
+            if side == "long":
+                self._bot_balances[bot_id] += entry_price * size + pnl
+            else:
+                self._bot_balances[bot_id] -= entry_price * size - pnl
+
         self._last_price[symbol] = exit_price
         self._positions.pop(symbol, None)
 
@@ -262,7 +277,19 @@ class PaperExchange(BaseExchange):
             leverage=pos.get("leverage", 1),
         )
 
+    def set_active_bot(self, bot_id: str) -> None:
+        """Set the active bot for per-bot balance tracking."""
+        self._active_bot_id = bot_id
+        if bot_id not in self._bot_balances:
+            self._bot_balances[bot_id] = self._per_bot_balance
+            self._bot_starting[bot_id] = self._per_bot_balance
+            logger.info("PAPER new sub-account for bot %s: $%.2f", bot_id, self._per_bot_balance)
+
     async def get_balance(self, asset: str = "USDT") -> Balance:
+        bot_id = getattr(self, '_active_bot_id', None)
+        if bot_id and bot_id in self._bot_balances:
+            bal = self._bot_balances[bot_id]
+            return Balance(asset=asset, total=bal, available=bal)
         return Balance(asset=asset, total=self._balance, available=self._balance)
 
     async def get_equity(self) -> float:

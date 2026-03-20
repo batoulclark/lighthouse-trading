@@ -246,5 +246,17 @@
     "message": "No signals in 42.2h \u2014 2 bot(s) active. Last trade: 2026-03-12 20:16 UTC",
     "hours_since_last_trade": 42.2,
     "active_bot_count": 2
+  },
+  {
+    "timestamp": "2026-03-20T00:52:19.038738+00:00",
+    "level": "WARNING",
+    "check": "kill_switch",
+    "message": "Kill switch is ACTIVE \u2014 trading halted. Kill switch activated: manual API call\nTimestamp: 2026-03-20T00:52:14.043001+00:00\n"
+  },
+  {
+    "timestamp": "2026-03-20T00:52:25.725552+00:00",
+    "level": "WARNING",
+    "check": "kill_switch",
+    "message": "Kill switch is ACTIVE \u2014 trading halted. Kill switch activated: manual API call\nTimestamp: 2026-03-20T00:52:14.043001+00:00\n"
   }
 ]

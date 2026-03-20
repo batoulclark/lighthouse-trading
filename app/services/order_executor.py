@@ -72,6 +72,10 @@ class OrderExecutor:
         if hasattr(exchange, "set_price") and getattr(signal, "price", None):
             exchange.set_price(bot.pair, signal.price)
 
+        # Set active bot for per-bot balance tracking
+        if hasattr(exchange, "set_active_bot"):
+            exchange.set_active_bot(bot.id)
+
         try:
             await exchange.set_leverage(bot.pair, bot.leverage)
         except Exception as exc:

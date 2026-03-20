@@ -257,7 +257,7 @@ def _fetch_binance(
         funding_df = _fetch_binance_funding(symbol, start, end)
         if not funding_df.empty:
             df = df.join(funding_df, how="left")
-            df["funding_rate"] = df["funding_rate"].fillna(method="ffill").fillna(0.0)
+            df["funding_rate"] = df["funding_rate"].ffill().fillna(0.0)
 
     return df
 

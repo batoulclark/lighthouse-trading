@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-03-20T01:30:56.403833+00:00",
+  "period": "2026-03-20",
+  "system": {
+    "total_signals": 0,
+    "total_fills": 0,
+    "fill_rate_pct": 0.0,
+    "avg_latency_ms": null,
+    "webhook_uptime_pct": 60.0
+  },
+  "per_bot": []
+}
